@@ -1,0 +1,2 @@
+export const metadata = { title: 'لوحة التحكم' }
+export default function Dashboard() { return <main><section><p className="eyebrow">لوحة التحكم</p><h1>مرحبًا بك</h1><div className="grid"><article className="card"><b>الوكلاء النشطون</b><h2>0</h2></article><article className="card"><b>المحادثات هذا الشهر</b><h2>0</h2></article><article className="card"><b>الحالة</b><p>اربط وكيلك الأول للبدء.</p></article></div></section></main> }
