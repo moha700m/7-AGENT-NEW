@@ -25,6 +25,12 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum GenerationStatus {
+  PENDING
+  COMPLETE
+  ERROR
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -35,6 +41,7 @@ model User {
   updatedAt DateTime @updatedAt
   agents    Agent[]
   subscriptions Subscription[]
+  runs      AgentRun[]
 }
 
 model Category {
@@ -61,8 +68,31 @@ model Agent {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   subscriptions Subscription[]
+  runs          AgentRun[]
 
   @@index([status, categoryId])
+}
+
+model AgentRun {
+  id             String           @id @default(cuid())
+  userId         String
+  agentId        String
+  model          String
+  prompt         String
+  output         String?
+  status         GenerationStatus @default(PENDING)
+  responseId     String?          @unique
+  inputTokens    Int?
+  outputTokens   Int?
+  totalTokens    Int?
+  errorMessage   String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent          Agent            @relation(fields: [agentId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+  @@index([agentId, createdAt])
 }
 
 model Subscription {
