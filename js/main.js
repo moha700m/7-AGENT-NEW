@@ -90,7 +90,7 @@ document.querySelectorAll('[data-plan]').forEach(btn =>
   })
 );
 
-// ---------- إرسال نموذج الطلب ----------
+// ---------- إرسال نموذج الطلب (Supabase Integration) ----------
 const form = document.getElementById('lead-form');
 const statusEl = document.getElementById('form-status');
 const submitBtn = document.getElementById('submit-btn');
@@ -121,26 +121,25 @@ form.addEventListener('submit', async e => {
   submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جارٍ الإرسال...';
 
   try {
-    const res = await fetch('tables/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: document.getElementById('lead-name').value.trim(),
-        company: document.getElementById('lead-company').value.trim(),
-        phone: phone.value.trim(),
-        agent_type: document.getElementById('lead-agent').value,
-        plan: document.getElementById('lead-plan').value,
-        message: document.getElementById('lead-message').value.trim(),
-        status: 'جديد',
-        created_at: Date.now()
-      })
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    // استخدام Supabase API بدلاً من /tables/leads
+    const leadData = {
+      name: document.getElementById('lead-name').value.trim(),
+      company: document.getElementById('lead-company').value.trim(),
+      phone: phone.value.trim(),
+      agent_type: document.getElementById('lead-agent').value,
+      plan: document.getElementById('lead-plan').value,
+      message: document.getElementById('lead-message').value.trim(),
+      status: 'جديد'
+    };
+
+    // استدعاء Supabase API
+    await window.SupabaseAPI.createLead(leadData);
+    
     form.reset();
     showStatus('✅ وصلنا طلبك! بنتواصل معك خلال ساعات العمل إن شاء الله.', true);
   } catch (err) {
-    console.error(err);
-    showStatus('حصل خطأ أثناء الإرسال، حاول مرة ثانية أو تواصل معنا واتساب.', false);
+    console.error('خطأ في إرسال الطلب:', err);
+    showStatus('حصل خطأ أثناء الإرسال، تأكد من الاتصال بالإنترنت أو حاول مرة ثانية.', false);
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> أرسل الطلب';
