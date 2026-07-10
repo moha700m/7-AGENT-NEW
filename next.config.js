@@ -19,13 +19,6 @@ const nextConfig = {
       ],
     },
   ],
-  redirects: async () => [
-    {
-      source: '/pricing',
-      destination: '/marketplace',
-      permanent: false,
-    },
-  ],
 };
 
 module.exports = nextConfig;
