@@ -1,7 +1,3 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
-enum Role { USER ADMIN }
-enum AgentStatus { DRAFT PUBLISHED ARCHIVED }
-model User { id String @id @default(cuid()); email String @unique; name String?; role Role @default(USER); createdAt DateTime @default(now()); updatedAt DateTime @updatedAt; agents Agent[] }
-model Category { id String @id @default(cuid()); slug String @unique; name String; nameAr String; agents Agent[] }
-model Agent { id String @id @default(cuid()); slug String @unique; name String; nameAr String; summary String; description String; priceMonthly Int; status AgentStatus @default(DRAFT); categoryId String; category Category @relation(fields:[categoryId],references:[id]); ownerId String; owner User @relation(fields:[ownerId],references:[id]); createdAt DateTime @default(now()); updatedAt DateTime @updatedAt; @@index([status,categoryId]) }
+import Link from 'next/link'
+const categories = ['واتساب', 'المبيعات', 'المواعيد', 'الصوت']
+export default function Home() { return <main><header><Link className="brand" href="/">وكيل<span>.AI</span></Link><nav><Link href="/marketplace">السوق</Link><Link href="/pricing">الباقات</Link><Link className="button" href="/dashboard">لوحة التحكم</Link></nav></header><section className="hero"><p className="eyebrow">صُنع بفخر في السعودية</p><h1>وظّف وكيلًا ذكيًا<br /><em>يعمل لأجلك 24 ساعة</em></h1><p>اكتشف وكلاء جاهزين لخدمة العملاء والمبيعات والحجوزات، مع تحكم كامل وخصوصية مدمجة.</p><div><Link className="button" href="/marketplace">استكشف السوق</Link><Link className="secondary" href="/pricing">شاهد الباقات</Link></div></section><section><h2>اختر وكيلك المناسب</h2><div className="grid">{categories.map((name) => <Link className="card" href="/marketplace" key={name}><b>{name}</b><p>مصمم للأعمال السعودية، وآمن وسريع.</p><span>استكشف ←</span></Link>)}</div></section></main> }
