@@ -18,8 +18,9 @@ jobs:
     timeout-minutes: 15
     env:
       DATABASE_URL: postgresql://build:build@localhost:5432/build
-      NEXTAUTH_SECRET: 01234567890123456789012345678901
+      NEXTAUTH_SECRET: '01234567890123456789012345678901'
       NEXTAUTH_URL: http://localhost:3000
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
