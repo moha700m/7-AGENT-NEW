@@ -1,0 +1,84 @@
+/* ====== Agent Store — أنماط لوحة التحكم ====== */
+
+.font-900 { font-weight: 900; }
+.font-800 { font-weight: 800; }
+
+/* ---- بطاقات KPI ---- */
+.kpi-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.2rem;
+  padding: 1.2rem 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 10px -4px rgba(15,23,42,.06);
+}
+.kpi-icon {
+  width: 3rem; height: 3rem;
+  border-radius: .9rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.kpi-num { font-family: 'Tajawal', sans-serif; font-weight: 900; font-size: 1.8rem; line-height: 1.1; color: #0f172a; }
+.kpi-label { font-size: .78rem; color: #64748b; }
+
+/* ---- الجدول ---- */
+.table-th { padding: .8rem 1rem; text-align: right; font-weight: 700; white-space: nowrap; }
+.table-td { padding: .85rem 1rem; vertical-align: middle; }
+#leads-tbody tr { border-top: 1px solid #f1f5f9; transition: background .15s; }
+#leads-tbody tr:hover { background: #f8fafc; }
+
+/* ---- شارات الحالة ---- */
+.status-select {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  padding: .3rem 1.8rem .3rem .8rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .6rem center;
+  transition: box-shadow .15s;
+}
+.status-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(16,185,129,.25); }
+.status-جديد        { background-color: #dbeafe; color: #1d4ed8; }
+.status-تواصل       { background-color: #fef3c7; color: #b45309; }
+.status-بيع         { background-color: #d1fae5; color: #047857; }
+.status-ملغي        { background-color: #fee2e2; color: #b91c1c; }
+
+/* ---- أزرار الإجراءات ---- */
+.action-btn {
+  width: 2.1rem; height: 2.1rem;
+  border-radius: .6rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+  transition: transform .15s, background .15s;
+}
+.action-btn:hover { transform: scale(1.1); }
+.action-wa  { background: #d1fae5; color: #047857; }
+.action-del { background: #fee2e2; color: #b91c1c; }
+
+/* ---- ترقيم الصفحات ---- */
+.page-btn {
+  width: 2.2rem; height: 2.2rem;
+  border-radius: .6rem;
+  background: #f1f5f9;
+  color: #334155;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.page-btn:hover:not(:disabled) { background: #d6f5e3; color: #0a7a56; }
+.page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ---- Toast ---- */
+#toast { animation: toastIn .3s ease; }
+@keyframes toastIn { from { opacity: 0; transform: translate(50%, 15px); } to { opacity: 1; transform: translate(50%, 0); } }
+
+@media (max-width: 640px) {
+  .kpi-num { font-size: 1.4rem; }
+  .table-td, .table-th { padding: .6rem .6rem; }
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — Agent Store</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#eefbf4', 100:'#d6f5e3', 500:'#10b981', 600:'#0d9668', 700:'#0a7a56', 900:'#064e38' },
+        night: { 800:'#0f172a', 900:'#0b1120' },
+        gold: '#d4af37'
+      },
+      fontFamily: {
+        head: ['Tajawal','sans-serif'],
+        body: ['"IBM Plex Sans Arabic"','sans-serif']
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen">
+
+<!-- ===== شاشة الدخول (PIN) ===== -->
+<div id="login-screen" class="fixed inset-0 z-50 bg-night-900 flex items-center justify-center p-4">
+  <form id="login-form" class="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl">
+    <span class="w-14 h-14 rounded-2xl bg-brand-500 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-lock text-white text-xl"></i></span>
+    <h1 class="font-head font-900 text-2xl mb-1">لوحة تحكم Agent Store</h1>
+    <p class="text-slate-500 text-sm mb-6">أدخل رمز الدخول للمتابعة</p>
+    <input id="pin-input" type="password" inputmode="numeric" maxlength="6" dir="ltr"
+           class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-brand-500 mb-4"
+           placeholder="••••" autocomplete="off" aria-label="رمز الدخول">
+    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition">دخول</button>
+    <p id="pin-error" class="hidden text-red-600 text-sm font-bold mt-3">رمز غير صحيح، حاول مرة ثانية</p>
+    <p class="text-[11px] text-slate-400 mt-5">⚠️ حماية مبسطة على مستوى الواجهة فقط — الرمز الافتراضي: 2464</p>
+  </form>
+</div>
+
+<!-- ===== المحتوى ===== -->
+<div id="dashboard" class="hidden">
+
+  <header class="bg-night-900 text-white sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
+        <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-sm"></i></span>
+        Agent <span class="text-brand-500">Store</span>
+        <span class="text-slate-400 text-sm font-medium hidden sm:inline">| لوحة التحكم</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <button id="refresh-btn" class="bg-white/10 hover:bg-white/20 text-sm font-bold px-4 py-2 rounded-lg transition" title="تحديث البيانات">
+          <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">تحديث</span>
+        </button>
+        <a href="index.html" class="bg-brand-500 hover:bg-brand-600 text-sm font-bold px-4 py-2 rounded-lg transition">
+          <i class="fa-solid fa-globe"></i> <span class="hidden sm:inline">الموقع</span>
+        </a>
+        <button id="logout-btn" class="bg-red-500/20 hover:bg-red-500/40 text-red-300 text-sm font-bold px-4 py-2 rounded-lg transition" title="خروج">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- بطاقات الإحصائيات -->
+    <section id="stats-section" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-label="إحصائيات">
+      <div class="kpi-card">
+        <div class="kpi-icon bg-brand-100 text-brand-600"><i class="fa-solid fa-inbox"></i></div>
+        <div><p class="kpi-num" id="kpi-total">0</p><p class="kpi-label">إجمالي الطلبات</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon bg-blue-100 text-blue-600"><i class="fa-solid fa-bell"></i></div>
+        <div><p class="kpi-num" id="kpi-new">0</p><p class="kpi-label">طلبات جديدة</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon bg-amber-100 text-amber-600"><i class="fa-solid fa-phone"></i></div>
+        <div><p class="kpi-num" id="kpi-contacted">0</p><p class="kpi-label">تم التواصل</p></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon bg-green-100 text-green-600"><i class="fa-solid fa-circle-check"></i></div>
+        <div><p class="kpi-num" id="kpi-won">0</p><p class="kpi-label">تم البيع</p></div>
+      </div>
+    </section>
+
+    <!-- الرسوم البيانية -->
+    <section id="charts-section" class="grid lg:grid-cols-2 gap-6 mb-8" aria-label="رسوم بيانية">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="font-head font-800 text-lg mb-4"><i class="fa-solid fa-chart-pie text-brand-500 ml-1"></i> الطلبات حسب نوع العميل الذكي</h2>
+        <div style="height: 280px;"><canvas id="agent-chart" aria-label="رسم بياني لأنواع العملاء"></canvas></div>
+      </div>
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <h2 class="font-head font-800 text-lg mb-4"><i class="fa-solid fa-chart-column text-brand-500 ml-1"></i> الطلبات حسب الباقة</h2>
+        <div style="height: 280px;"><canvas id="plan-chart" aria-label="رسم بياني للباقات"></canvas></div>
+      </div>
+    </section>
+
+    <!-- جدول الطلبات -->
+    <section id="leads-section" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" aria-label="الطلبات">
+      <div class="p-5 border-b border-slate-100 flex flex-wrap items-center gap-3">
+        <h2 class="font-head font-800 text-lg flex-1 whitespace-nowrap"><i class="fa-solid fa-table-list text-brand-500 ml-1"></i> الطلبات الواردة</h2>
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input id="search-input" type="search" placeholder="ابحث بالاسم أو الجوال..." class="border-2 border-slate-200 rounded-xl pr-9 pl-3 py-2 text-sm focus:outline-none focus:border-brand-500 w-52">
+        </div>
+        <select id="status-filter" class="border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-500" aria-label="فلتر الحالة">
+          <option value="">كل الحالات</option>
+          <option>جديد</option>
+          <option>تم التواصل</option>
+          <option>تم البيع</option>
+          <option>ملغي</option>
+        </select>
+        <button id="export-btn" class="bg-night-900 hover:bg-night-800 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
+          <i class="fa-solid fa-file-csv"></i> تصدير CSV
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="leads-table">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 text-xs">
+              <th class="table-th">العميل</th>
+              <th class="table-th">الجوال</th>
+              <th class="table-th">نوع العميل الذكي</th>
+              <th class="table-th">الباقة</th>
+              <th class="table-th">التفاصيل</th>
+              <th class="table-th">التاريخ</th>
+              <th class="table-th">الحالة</th>
+              <th class="table-th">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="empty-state" class="hidden text-center py-16 text-slate-400">
+        <i class="fa-solid fa-inbox text-5xl mb-4"></i>
+        <p class="font-bold text-lg">لا توجد طلبات حتى الآن</p>
+        <p class="text-sm">الطلبات الجديدة من نموذج الموقع بتظهر هنا تلقائياً</p>
+      </div>
+
+      <div id="loading-state" class="text-center py-16 text-slate-400">
+        <i class="fa-solid fa-spinner fa-spin text-4xl mb-3"></i>
+        <p class="font-bold">جارٍ تحميل الطلبات...</p>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+        <span id="table-count">—</span>
+        <div class="flex gap-2">
+          <button id="prev-page" class="page-btn" aria-label="الصفحة السابقة"><i class="fa-solid fa-chevron-right"></i></button>
+          <span id="page-info" class="px-3 py-1.5 font-bold">1</span>
+          <button id="next-page" class="page-btn" aria-label="الصفحة التالية"><i class="fa-solid fa-chevron-left"></i></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-slate-400 py-6">
+    © 2026 Agent Store — لوحة التحكم الداخلية
+  </footer>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-6 right-1/2 translate-x-1/2 z-50 bg-night-900 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-2xl" role="status"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

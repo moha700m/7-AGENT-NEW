@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Store — متجر عملاء الذكاء الاصطناعي | صُنع في السعودية</title>
+<meta name="description" content="Agent Store: متجر سعودي يوفر موظفين ذكاء اصطناعي جاهزين — عميل واتساب يرد على عملائك، يحجز المواعيد، ويزيد مبيعاتك 24/7.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#eefbf4', 100:'#d6f5e3', 500:'#10b981', 600:'#0d9668', 700:'#0a7a56', 900:'#064e38' },
+        night: { 800:'#0f172a', 900:'#0b1120' },
+        gold: '#d4af37'
+      },
+      fontFamily: {
+        head: ['Tajawal','sans-serif'],
+        body: ['"IBM Plex Sans Arabic"','sans-serif']
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="font-body bg-white text-slate-800 antialiased">
+
+<!-- ===== Header ===== -->
+<header id="site-header" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-night-900/90 backdrop-blur-md">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16" aria-label="القائمة الرئيسية">
+    <a href="#hero-section" class="flex items-center gap-2 font-head font-900 text-2xl text-white">
+      <span class="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i></span>
+      Agent <span class="text-brand-500">Store</span>
+    </a>
+    <ul class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+      <li><a href="#agents-section" class="hover:text-brand-500 transition">العملاء الأذكياء</a></li>
+      <li><a href="#how-section" class="hover:text-brand-500 transition">كيف يعمل</a></li>
+      <li><a href="#features-section" class="hover:text-brand-500 transition">المميزات</a></li>
+      <li><a href="#pricing-section" class="hover:text-brand-500 transition">الباقات</a></li>
+      <li><a href="#faq-section" class="hover:text-brand-500 transition">الأسئلة الشائعة</a></li>
+    </ul>
+    <div class="flex items-center gap-3">
+      <a href="#contact-section" class="hidden sm:inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition">
+        اطلب عميلك الآن <i class="fa-solid fa-arrow-left text-xs"></i>
+      </a>
+      <button id="mobile-menu-btn" class="md:hidden text-white text-xl w-10 h-10" aria-label="فتح القائمة"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+  <div id="mobile-menu" class="hidden md:hidden bg-night-900 border-t border-white/10 px-6 py-4">
+    <ul class="flex flex-col gap-4 text-slate-200 font-medium">
+      <li><a href="#agents-section" class="mobile-link">العملاء الأذكياء</a></li>
+      <li><a href="#how-section" class="mobile-link">كيف يعمل</a></li>
+      <li><a href="#features-section" class="mobile-link">المميزات</a></li>
+      <li><a href="#pricing-section" class="mobile-link">الباقات</a></li>
+      <li><a href="#faq-section" class="mobile-link">الأسئلة الشائعة</a></li>
+      <li><a href="#contact-section" class="mobile-link text-brand-500 font-bold">اطلب عميلك الآن</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section id="hero-section" class="relative overflow-hidden bg-night-900 text-white pt-32 pb-20 lg:pt-40 lg:pb-28">
+  <div class="hero-glow"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-14 items-center relative z-10">
+    <div>
+      <span class="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-brand-100 text-xs font-bold px-4 py-1.5 rounded-full mb-6">
+        <i class="fa-solid fa-star text-gold"></i> صُنع بفخر في المملكة العربية السعودية 🇸🇦
+      </span>
+      <h1 class="font-head font-900 text-4xl sm:text-5xl lg:text-6xl leading-[1.15] mb-6">
+        وظّف <span class="text-brand-500">موظف ذكاء اصطناعي</span><br>يشتغل لك <span class="underline decoration-gold decoration-4 underline-offset-8">24 ساعة</span> بدون إجازات
+      </h1>
+      <p class="text-slate-300 text-lg leading-relaxed mb-8 max-w-xl">
+        عميل واتساب ذكي يرد على استفسارات عملائك فوراً، يحجز المواعيد، يتابع الطلبات، ويقفل صفقات المبيعات — وأنت مرتاح. جاهز خلال 48 ساعة.
+      </p>
+      <div class="flex flex-wrap gap-4 mb-10">
+        <a href="#contact-section" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-bold px-7 py-3.5 rounded-xl text-lg transition shadow-lg shadow-brand-500/30">
+          <i class="fa-brands fa-whatsapp text-xl"></i> اطلب عميلك الذكي
+        </a>
+        <a href="#how-section" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-7 py-3.5 rounded-xl text-lg transition">
+          شاهد كيف يعمل
+        </a>
+      </div>
+      <div class="grid grid-cols-3 gap-4 max-w-md">
+        <div class="stat-box"><span class="stat-num" data-count="97">0</span><span class="text-2xl font-900 text-brand-500">%</span><p class="stat-label">رضا العملاء</p></div>
+        <div class="stat-box"><span class="stat-num" data-count="3">0</span><span class="text-2xl font-900 text-brand-500">ث</span><p class="stat-label">سرعة الرد</p></div>
+        <div class="stat-box"><span class="stat-num" data-count="60">0</span><span class="text-2xl font-900 text-brand-500">%</span><p class="stat-label">توفير التكاليف</p></div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Chat Demo -->
+    <div class="relative mx-auto w-full max-w-sm">
+      <div class="phone-frame">
+        <div class="chat-header">
+          <div class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-robot text-white"></i></div>
+          <div class="flex-1">
+            <p class="font-bold text-sm text-white">Agent Store — المساعد الذكي</p>
+            <p class="text-[11px] text-brand-100 flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span> متصل الآن</p>
+          </div>
+          <i class="fa-brands fa-whatsapp text-2xl text-white/90"></i>
+        </div>
+        <div id="chat-body" class="chat-body" aria-live="polite"></div>
+        <div class="chat-input">
+          <i class="fa-regular fa-face-smile text-slate-400"></i>
+          <span class="flex-1 text-slate-400 text-xs">اكتب رسالة...</span>
+          <span class="w-8 h-8 bg-brand-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-microphone text-white text-xs"></i></span>
+        </div>
+      </div>
+      <div class="floating-badge -right-4 top-16"><i class="fa-solid fa-calendar-check text-brand-500"></i> تم حجز موعد!</div>
+      <div class="floating-badge -left-4 bottom-24" style="animation-delay:1.5s"><i class="fa-solid fa-bolt text-gold"></i> رد خلال ثوانٍ</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Trust bar ===== -->
+<section id="trust-bar" class="bg-brand-50 border-b border-brand-100 py-5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm font-bold text-brand-900">
+    <span class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-brand-600"></i> متوافق مع أنظمة حماية البيانات السعودية</span>
+    <span class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-brand-600"></i> واجهة واتساب للأعمال الرسمية</span>
+    <span class="flex items-center gap-2"><i class="fa-solid fa-language text-brand-600"></i> يفهم اللهجات السعودية والخليجية</span>
+    <span class="flex items-center gap-2"><i class="fa-solid fa-headset text-brand-600"></i> دعم فني محلي 24/7</span>
+  </div>
+</section>
+
+<!-- ===== Agents ===== -->
+<section id="agents-section" class="py-20 lg:py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="section-badge">فريقك الذكي</span>
+      <h2 class="section-title">اختر العميل الذكي المناسب لنشاطك</h2>
+      <p class="text-slate-500 text-lg">كل عميل مدرّب على مجال عملك، يتكلم بأسلوبك، ويخدم عملاءك باحترافية.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="agent-card group">
+        <div class="agent-icon bg-green-100 text-green-600"><i class="fa-brands fa-whatsapp"></i></div>
+        <h3 class="agent-title">عميل واتساب</h3>
+        <p class="agent-desc">يرد على استفسارات عملائك فوراً على واتساب، يرسل الأسعار والكتالوجات، ويحوّل المحادثات الجادة لفريقك.</p>
+        <ul class="agent-list">
+          <li>رد فوري على مدار الساعة</li>
+          <li>يفهم الصوتيات والصور</li>
+          <li>ردود بلهجة عملائك</li>
+        </ul>
+        <a href="#contact-section" class="agent-cta" data-agent="عميل واتساب">اطلبه الآن <i class="fa-solid fa-arrow-left text-xs"></i></a>
+      </article>
+      <article class="agent-card group border-brand-500 relative">
+        <span class="absolute -top-3 right-5 bg-gold text-night-900 text-[11px] font-900 px-3 py-1 rounded-full">الأكثر طلباً ⭐</span>
+        <div class="agent-icon bg-brand-100 text-brand-600"><i class="fa-solid fa-calendar-check"></i></div>
+        <h3 class="agent-title">عميل حجز المواعيد</h3>
+        <p class="agent-desc">يرتب مواعيد عملائك تلقائياً، يرسل تذكيرات، ويعيد الجدولة عند الإلغاء — مثالي للعيادات والصالونات.</p>
+        <ul class="agent-list">
+          <li>ربط مع تقويم Google</li>
+          <li>تذكير تلقائي قبل الموعد</li>
+          <li>تقليل نسبة الغياب 70%</li>
+        </ul>
+        <a href="#contact-section" class="agent-cta" data-agent="عميل حجز مواعيد">اطلبه الآن <i class="fa-solid fa-arrow-left text-xs"></i></a>
+      </article>
+      <article class="agent-card group">
+        <div class="agent-icon bg-amber-100 text-amber-600"><i class="fa-solid fa-chart-line"></i></div>
+        <h3 class="agent-title">عميل مبيعات</h3>
+        <p class="agent-desc">يتابع العملاء المهتمين، يعرض المنتجات، يجاوب على الاعتراضات، ويقفل الصفقة أو يحوّلها لمندوبك.</p>
+        <ul class="agent-list">
+          <li>متابعة تلقائية للعملاء</li>
+          <li>عروض وأسعار فورية</li>
+          <li>تقارير مبيعات يومية</li>
+        </ul>
+        <a href="#contact-section" class="agent-cta" data-agent="عميل مبيعات">اطلبه الآن <i class="fa-solid fa-arrow-left text-xs"></i></a>
+      </article>
+      <article class="agent-card group">
+        <div class="agent-icon bg-purple-100 text-purple-600"><i class="fa-solid fa-phone-volume"></i></div>
+        <h3 class="agent-title">عميل رد صوتي</h3>
+        <p class="agent-desc">يستقبل مكالمات عملائك بصوت طبيعي، يجاوب على الأسئلة الشائعة، ويسجل الطلبات — بدون انتظار.</p>
+        <ul class="agent-list">
+          <li>صوت عربي طبيعي</li>
+          <li>استقبال غير محدود</li>
+          <li>تسجيل وتحويل المكالمات</li>
+        </ul>
+        <a href="#contact-section" class="agent-cta" data-agent="عميل رد صوتي">اطلبه الآن <i class="fa-solid fa-arrow-left text-xs"></i></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== How it works ===== -->
+<section id="how-section" class="py-20 lg:py-28 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="section-badge">3 خطوات فقط</span>
+      <h2 class="section-title">عميلك الذكي جاهز خلال 48 ساعة</h2>
+      <p class="text-slate-500 text-lg">بدون تعقيدات تقنية — فريقنا يجهز كل شيء لك.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 relative">
+      <div class="step-line hidden md:block"></div>
+      <article class="step-card">
+        <span class="step-num">1</span>
+        <div class="step-icon"><i class="fa-solid fa-comments"></i></div>
+        <h3 class="font-head font-800 text-xl mb-2">نفهم نشاطك</h3>
+        <p class="text-slate-500 leading-relaxed">جلسة قصيرة نتعرف فيها على خدماتك، أسعارك، وأسلوب ردك المفضل على العملاء.</p>
+      </article>
+      <article class="step-card">
+        <span class="step-num">2</span>
+        <div class="step-icon"><i class="fa-solid fa-gears"></i></div>
+        <h3 class="font-head font-800 text-xl mb-2">ندرّب عميلك الذكي</h3>
+        <p class="text-slate-500 leading-relaxed">نغذيه ببيانات نشاطك ونربطه بواتسابك وتقويمك، ثم نختبره معك قبل الإطلاق.</p>
+      </article>
+      <article class="step-card">
+        <span class="step-num">3</span>
+        <div class="step-icon"><i class="fa-solid fa-rocket"></i></div>
+        <h3 class="font-head font-800 text-xl mb-2">ينطلق ويخدم عملاءك</h3>
+        <p class="text-slate-500 leading-relaxed">يبدأ الرد والحجز فوراً، وتتابع أداءه من لوحة تحكم بسيطة مع تقارير أسبوعية.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features ===== -->
+<section id="features-section" class="py-20 lg:py-28 bg-night-900 text-white relative overflow-hidden">
+  <div class="hero-glow opacity-50"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="section-badge bg-white/10 text-brand-100 border border-white/15">ليش Agent Store؟</span>
+      <h2 class="section-title text-white">مميزات تخلّي عملاءك يحبون التعامل معك</h2>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="feature-card"><i class="fa-solid fa-clock feature-icon"></i><h3>شغّال 24/7</h3><p>ما يمرض، ما يتأخر، وما ياخذ إجازة عيد — عملاؤك يلقون رد في أي وقت.</p></div>
+      <div class="feature-card"><i class="fa-solid fa-language feature-icon"></i><h3>يفهم اللهجة</h3><p>مدرّب على اللهجات السعودية والخليجية، ويرد بنفس أسلوب منطقتك.</p></div>
+      <div class="feature-card"><i class="fa-solid fa-plug feature-icon"></i><h3>يرتبط بأنظمتك</h3><p>ربط مع واتساب للأعمال، تقويم Google، سلة، زد، وأنظمة الحجز الشهيرة.</p></div>
+      <div class="feature-card"><i class="fa-solid fa-user-tie feature-icon"></i><h3>تحويل ذكي للبشر</h3><p>إذا حس إن العميل يحتاج إنسان، يحوّل المحادثة لفريقك فوراً مع ملخص كامل.</p></div>
+      <div class="feature-card"><i class="fa-solid fa-chart-pie feature-icon"></i><h3>تقارير واضحة</h3><p>كم محادثة؟ كم حجز؟ وش أكثر الأسئلة؟ كل شيء في لوحة تحكم بسيطة.</p></div>
+      <div class="feature-card"><i class="fa-solid fa-lock feature-icon"></i><h3>بياناتك بأمان</h3><p>تشفير كامل للمحادثات والتزام بأنظمة حماية البيانات الشخصية في المملكة.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Pricing ===== -->
+<section id="pricing-section" class="py-20 lg:py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="section-badge">باقات مرنة</span>
+      <h2 class="section-title">أسعار أقل من راتب موظف واحد</h2>
+      <p class="text-slate-500 text-lg">بدون رسوم تأسيس مخفية — وتقدر تلغي في أي وقت.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
+      <article class="price-card">
+        <h3 class="price-name">أساسية</h3>
+        <p class="text-slate-500 text-sm mb-5">للأنشطة الصغيرة والناشئة</p>
+        <p class="price-amount">499<span> ر.س/شهر</span></p>
+        <ul class="price-list">
+          <li><i class="fa-solid fa-check"></i> عميل واتساب واحد</li>
+          <li><i class="fa-solid fa-check"></i> 1,000 محادثة شهرياً</li>
+          <li><i class="fa-solid fa-check"></i> رد آلي على الأسئلة الشائعة</li>
+          <li><i class="fa-solid fa-check"></i> تقرير شهري</li>
+          <li class="opacity-40"><i class="fa-solid fa-xmark"></i> حجز مواعيد</li>
+        </ul>
+        <a href="#contact-section" class="price-cta price-cta-outline" data-plan="أساسية">ابدأ الآن</a>
+      </article>
+      <article class="price-card price-card-popular">
+        <span class="popular-tag">الأكثر شيوعاً</span>
+        <h3 class="price-name text-white">نمو</h3>
+        <p class="text-brand-100 text-sm mb-5">للعيادات والصالونات والمتاجر</p>
+        <p class="price-amount text-white">999<span class="text-brand-100"> ر.س/شهر</span></p>
+        <ul class="price-list price-list-light">
+          <li><i class="fa-solid fa-check"></i> عميل واتساب + حجز مواعيد</li>
+          <li><i class="fa-solid fa-check"></i> 5,000 محادثة شهرياً</li>
+          <li><i class="fa-solid fa-check"></i> ربط تقويم وتذكيرات تلقائية</li>
+          <li><i class="fa-solid fa-check"></i> تحويل ذكي للموظفين</li>
+          <li><i class="fa-solid fa-check"></i> تقارير أسبوعية + دعم أولوية</li>
+        </ul>
+        <a href="#contact-section" class="price-cta price-cta-solid" data-plan="نمو">اختر باقة النمو</a>
+      </article>
+      <article class="price-card">
+        <h3 class="price-name">أعمال</h3>
+        <p class="text-slate-500 text-sm mb-5">للشركات والفروع المتعددة</p>
+        <p class="price-amount">تواصل<span> معنا</span></p>
+        <ul class="price-list">
+          <li><i class="fa-solid fa-check"></i> عدة عملاء أذكياء (واتساب + صوتي)</li>
+          <li><i class="fa-solid fa-check"></i> محادثات غير محدودة</li>
+          <li><i class="fa-solid fa-check"></i> ربط مخصص بأنظمتك (CRM/ERP)</li>
+          <li><i class="fa-solid fa-check"></i> مدير حساب مخصص</li>
+          <li><i class="fa-solid fa-check"></i> اتفاقية مستوى خدمة SLA</li>
+        </ul>
+        <a href="#contact-section" class="price-cta price-cta-outline" data-plan="أعمال">اطلب عرض سعر</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Testimonials ===== -->
+<section id="testimonials-section" class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="section-badge">قالوا عنا</span>
+      <h2 class="section-title">عملاء سعوديون وثقوا فينا</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <figure class="testimonial-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"كنا نفقد حجوزات كثيرة بعد الدوام. الحين العميل الذكي يحجز للمرضى حتى الساعة 3 الفجر. الحجوزات زادت 40% أول شهر."</blockquote>
+        <figcaption><strong>د. عبدالله القحطاني</strong><span>مدير عيادات أسنان — الرياض</span></figcaption>
+      </figure>
+      <figure class="testimonial-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"عندي متجر إلكتروني والأسئلة المتكررة كانت تاكل وقتي. عميل الواتساب يرد على 90% من الاستفسارات بروحه، وأنا أتفرغ للتطوير."</blockquote>
+        <figcaption><strong>سارة العتيبي</strong><span>مؤسسة متجر عطور — جدة</span></figcaption>
+      </figure>
+      <figure class="testimonial-card">
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"جربنا موظفين رد على الجوال وكانت التكلفة عالية. عميل وكيل الصوتي يستقبل كل المكالمات ويحوّل المهم بس. وفرنا 60% من التكاليف."</blockquote>
+        <figcaption><strong>م. فهد الشمري</strong><span>مدير شركة صيانة — الدمام</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq-section" class="py-20 lg:py-28 bg-white">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="text-center mb-12">
+      <span class="section-badge">عندك سؤال؟</span>
+      <h2 class="section-title">الأسئلة الشائعة</h2>
+    </div>
+    <div id="faq-list" class="space-y-4">
+      <details class="faq-item">
+        <summary>هل العميل الذكي يرد بشكل طبيعي ولا يبان إنه روبوت؟</summary>
+        <p>يرد بأسلوب طبيعي جداً وبلهجة عملائك، ونخصص شخصيته (رسمي/ودود) حسب نشاطك. وطبعاً نقدر نخليه يعرّف عن نفسه كمساعد ذكي إذا حبيت الشفافية الكاملة.</p>
+      </details>
+      <details class="faq-item">
+        <summary>كم يحتاج وقت حتى يكون جاهز؟</summary>
+        <p>عادةً 48 ساعة من استلام بيانات نشاطك (الخدمات، الأسعار، أوقات العمل). الحلول المخصصة للشركات قد تحتاج من أسبوع إلى أسبوعين.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل يشتغل على رقم واتسابي الحالي؟</summary>
+        <p>نعم، نربطه برقمك عبر واتساب للأعمال الرسمي (WhatsApp Business API) بدون ما تفقد محادثاتك أو رقمك.</p>
+      </details>
+      <details class="faq-item">
+        <summary>وش يصير إذا سأل العميل سؤال ما يعرف إجابته؟</summary>
+        <p>يحوّل المحادثة تلقائياً لفريقك مع ملخص لكل اللي صار، ويتعلم من الإجابة عشان يرد بنفسه المرة الجاية.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل في عقد التزام طويل؟</summary>
+        <p>لا، كل الباقات شهرية وتقدر تلغي في أي وقت. وفي ضمان استرجاع خلال أول 14 يوم إذا ما كنت راضي.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل بياناتي وبيانات عملائي آمنة؟</summary>
+        <p>نعم، كل المحادثات مشفرة ونلتزم بنظام حماية البيانات الشخصية السعودي (PDPL). بياناتك ملكك ولا تُشارك مع أي طرف ثالث.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Contact / Order form ===== -->
+<section id="contact-section" class="py-20 lg:py-28 bg-slate-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-start">
+    <div>
+      <span class="section-badge">ابدأ اليوم</span>
+      <h2 class="section-title text-right">اطلب عميلك الذكي الآن</h2>
+      <p class="text-slate-500 text-lg leading-relaxed mb-8">عبّي النموذج وبيتواصل معك فريقنا خلال ساعات العمل لعرض تجريبي مجاني على نشاطك — بدون أي التزام.</p>
+      <ul class="space-y-4 text-slate-700">
+        <li class="flex items-center gap-3"><span class="contact-bullet"><i class="fa-solid fa-gift"></i></span> عرض تجريبي مجاني على بيانات نشاطك الحقيقية</li>
+        <li class="flex items-center gap-3"><span class="contact-bullet"><i class="fa-solid fa-shield-heart"></i></span> ضمان استرجاع 14 يوم</li>
+        <li class="flex items-center gap-3"><span class="contact-bullet"><i class="fa-solid fa-bolt"></i></span> تجهيز وإطلاق خلال 48 ساعة</li>
+      </ul>
+      <div class="mt-10 p-5 bg-night-900 rounded-2xl text-white flex items-center gap-4">
+        <i class="fa-brands fa-whatsapp text-4xl text-brand-500"></i>
+        <div class="flex-1">
+          <p class="font-bold">تفضل تكلمنا واتساب مباشرة؟</p>
+          <p class="text-slate-300 text-sm">راسلنا على <a href="https://wa.me/966555462764" target="_blank" rel="noopener" dir="ltr" class="font-bold text-brand-500 hover:underline">+966 55 546 2764</a></p>
+        </div>
+        <a href="https://wa.me/966555462764?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D8%BA%D9%89%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%B9%D9%85%D9%84%D8%A7%D8%A1%20%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1" target="_blank" rel="noopener" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition whitespace-nowrap">راسلنا</a>
+      </div>
+    </div>
+
+    <form id="lead-form" class="bg-white rounded-3xl shadow-xl shadow-slate-200 p-7 sm:p-9 border border-slate-100" novalidate>
+      <div class="grid sm:grid-cols-2 gap-5 mb-5">
+        <div>
+          <label for="lead-name" class="form-label">الاسم *</label>
+          <input id="lead-name" name="name" type="text" required class="form-input" placeholder="مثال: محمد العلي">
+        </div>
+        <div>
+          <label for="lead-company" class="form-label">اسم النشاط / الشركة</label>
+          <input id="lead-company" name="company" type="text" class="form-input" placeholder="مثال: عيادة النور">
+        </div>
+      </div>
+      <div class="mb-5">
+        <label for="lead-phone" class="form-label">رقم الجوال *</label>
+        <input id="lead-phone" name="phone" type="tel" dir="ltr" required class="form-input text-left" placeholder="05XXXXXXXX">
+      </div>
+      <div class="grid sm:grid-cols-2 gap-5 mb-5">
+        <div>
+          <label for="lead-agent" class="form-label">نوع العميل الذكي *</label>
+          <select id="lead-agent" name="agent_type" required class="form-input">
+            <option value="">اختر...</option>
+            <option>عميل واتساب</option>
+            <option>عميل حجز مواعيد</option>
+            <option>عميل مبيعات</option>
+            <option>عميل رد صوتي</option>
+            <option>حل مخصص</option>
+          </select>
+        </div>
+        <div>
+          <label for="lead-plan" class="form-label">الباقة المفضلة</label>
+          <select id="lead-plan" name="plan" class="form-input">
+            <option value="غير محدد">غير محدد بعد</option>
+            <option>أساسية</option>
+            <option>نمو</option>
+            <option>أعمال</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-6">
+        <label for="lead-message" class="form-label">تفاصيل إضافية</label>
+        <textarea id="lead-message" name="message" rows="3" class="form-input resize-none" placeholder="حدثنا عن نشاطك وكيف تبغى العميل الذكي يساعدك..."></textarea>
+      </div>
+      <button type="submit" id="submit-btn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-lg py-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25">
+        <i class="fa-solid fa-paper-plane"></i> أرسل الطلب
+      </button>
+      <p id="form-status" class="hidden mt-4 text-center font-bold rounded-xl py-3 px-4" role="status"></p>
+      <p class="text-xs text-slate-400 text-center mt-4">بإرسالك الطلب أنت توافق على تواصلنا معك عبر الجوال أو الواتساب.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer id="site-footer" class="bg-night-900 text-slate-300 pt-14 pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 grid md:grid-cols-4 gap-10 mb-10">
+    <div class="md:col-span-2">
+      <a href="#hero-section" class="flex items-center gap-2 font-head font-900 text-2xl text-white mb-4">
+        <span class="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-white text-lg"></i></span>
+        Agent <span class="text-brand-500">Store</span>
+      </a>
+      <p class="leading-relaxed text-sm max-w-md">Agent Store — متجر سعودي متخصص في بناء عملاء الذكاء الاصطناعي للأعمال — نساعد المنشآت السعودية على خدمة عملائها بذكاء، على مدار الساعة، وبتكلفة أقل.</p>
+      <div class="flex gap-3 mt-5">
+        <a href="#" aria-label="تويتر" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="لينكدإن" class="social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" aria-label="انستقرام" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="تيك توك" class="social-link"><i class="fa-brands fa-tiktok"></i></a>
+      </div>
+    </div>
+    <nav aria-label="روابط سريعة">
+      <h3 class="text-white font-head font-800 mb-4">روابط سريعة</h3>
+      <ul class="space-y-2.5 text-sm">
+        <li><a href="#agents-section" class="hover:text-brand-500 transition">العملاء الأذكياء</a></li>
+        <li><a href="#pricing-section" class="hover:text-brand-500 transition">الباقات والأسعار</a></li>
+        <li><a href="#faq-section" class="hover:text-brand-500 transition">الأسئلة الشائعة</a></li>
+        <li><a href="#contact-section" class="hover:text-brand-500 transition">اطلب الآن</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h3 class="text-white font-head font-800 mb-4">تواصل معنا</h3>
+      <ul class="space-y-2.5 text-sm">
+        <li class="flex items-center gap-2"><i class="fa-solid fa-location-dot text-brand-500"></i> الرياض، المملكة العربية السعودية</li>
+        <li class="flex items-center gap-2"><i class="fa-solid fa-envelope text-brand-500"></i> hello@agentstore.sa</li>
+        <li class="flex items-center gap-2"><i class="fa-brands fa-whatsapp text-brand-500"></i> <a href="https://wa.me/966555462764" target="_blank" rel="noopener" dir="ltr" class="hover:text-brand-500 transition">+966 55 546 2764</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 border-t border-white/10 text-center text-xs text-slate-500">
+    © 2026 Agent Store — جميع الحقوق محفوظة | صُنع بـ <i class="fa-solid fa-heart text-brand-500"></i> في السعودية | <a href="admin.html" class="hover:text-brand-500 transition">لوحة التحكم</a>
+  </div>
+</footer>
+
+<!-- زر واتساب عائم -->
+<a id="whatsapp-float" href="https://wa.me/966555462764?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85%D8%8C%20%D8%A3%D8%A8%D8%BA%D9%89%20%D8%A3%D8%B3%D8%AA%D9%81%D8%B3%D8%B1%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%B9%D9%85%D9%84%D8%A7%D8%A1%20%D8%A7%D9%84%D8%A3%D8%B0%D9%83%D9%8A%D8%A7%D8%A1" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<script src="js/main.js"></script>
+</body>
+</html>
