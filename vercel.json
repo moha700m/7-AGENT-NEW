@@ -1,11 +1,28 @@
 {
+  "env": {
+    "SUPABASE_URL": "https://hpjbkxknzblmqsvmlykk.supabase.co",
+    "SUPABASE_ANON_KEY": "sb_publishable_WZ-EmQLRBAYqmT3uJfJi8w_97t0V5vf"
+  },
   "headers": [
+    {
+      "source": "/api/config",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
       ]
     }

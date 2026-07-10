@@ -1,52 +1,78 @@
 /* ====== Agent Store — سكربت لوحة التحكم (Supabase Integration) ====== */
 'use strict';
 
-// إعدادات
-const ADMIN_PIN = '2464';
 const PAGE_SIZE = 10;
 
-// حالة التطبيق
 let allLeads = [];
 let filtered = [];
 let currentPage = 1;
 let agentChart = null;
 let planChart = null;
 
-// عناصر DOM
 const $ = id => document.getElementById(id);
 const loginScreen = $('login-screen');
 const dashboard = $('dashboard');
 
-// ---------- الدخول ----------
-function isLoggedIn() {
-  return sessionStorage.getItem('as_admin') === '1';
-}
-
-function showDashboard() {
+// ---------- Supabase Auth ----------
+async function showDashboard() {
   loginScreen.classList.add('hidden');
   dashboard.classList.remove('hidden');
-  loadLeads();
+  await loadLeads();
 }
 
-$('login-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const pin = $('pin-input').value.trim();
-  if (pin === ADMIN_PIN) {
-    sessionStorage.setItem('as_admin', '1');
-    showDashboard();
-  } else {
-    $('pin-error').classList.remove('hidden');
-    $('pin-input').value = '';
-    $('pin-input').focus();
+function showLoginError(message) {
+  const errorElement = $('login-error');
+  errorElement.textContent = message;
+  errorElement.classList.remove('hidden');
+}
+
+$('login-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const email = $('email-input').value.trim();
+  const password = $('password-input').value;
+  const submitButton = $('login-submit');
+
+  $('login-error').classList.add('hidden');
+  submitButton.disabled = true;
+  submitButton.textContent = 'جارٍ التحقق...';
+
+  try {
+    await window.SupabaseAPI.signIn(email, password);
+    await showDashboard();
+  } catch (error) {
+    console.error('Admin sign-in failed:', error);
+    const message = error?.message === 'Email not confirmed'
+      ? 'البريد غير مؤكد في Supabase Auth.'
+      : 'تعذر تسجيل الدخول. تحقق من البريد وكلمة المرور وصلاحية الحساب.';
+    showLoginError(message);
+    $('password-input').value = '';
+    $('password-input').focus();
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'دخول آمن';
   }
 });
 
-$('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem('as_admin');
-  location.reload();
+$('logout-btn').addEventListener('click', async () => {
+  try {
+    await window.SupabaseAPI.signOut();
+  } finally {
+    location.reload();
+  }
 });
 
-if (isLoggedIn()) showDashboard();
+async function bootstrapAdmin() {
+  try {
+    const adminSession = await window.SupabaseAPI.getAdminSession();
+    if (adminSession) await showDashboard();
+    else $('email-input').focus();
+  } catch (error) {
+    console.error('Supabase initialization failed:', error);
+    showLoginError('تعذر الاتصال بخدمة تسجيل الدخول. حاول مرة أخرى.');
+  }
+}
+
+bootstrapAdmin();
 
 // ---------- جلب البيانات من Supabase ----------
 async function loadLeads() {
@@ -64,7 +90,7 @@ async function loadLeads() {
     applyFilters();
   } catch (err) {
     console.error('فشل تحميل الطلبات:', err);
-    toast('⚠️ تعذر تحميل البيانات — تأكد من إعدادات Supabase');
+    toast('تعذر تحميل البيانات. تحقق من الاتصال والصلاحيات.');
   } finally {
     $('loading-state').classList.add('hidden');
   }
@@ -72,7 +98,7 @@ async function loadLeads() {
 
 $('refresh-btn').addEventListener('click', () => { 
   loadLeads(); 
-  toast('تم تحديث البيانات ✓'); 
+  toast('تم تحديث البيانات.');
 });
 
 // ---------- الإحصائيات ----------
@@ -222,14 +248,14 @@ $('leads-tbody').addEventListener('change', async e => {
   sel.disabled = true;
   try {
     await window.SupabaseAPI.updateLeadStatus(id, newStatus);
-    const lead = allLeads.find(l => l.id === id);
+    const lead = allLeads.find(l => String(l.id) === String(id));
     if (lead) lead.status = newStatus;
     sel.className = `status-select ${STATUS_CLASS[newStatus] || 'status-جديد'}`;
     updateKPIs();
-    toast(`تم تحديث الحالة إلى "${newStatus}" ✓`);
+    toast(`تم تحديث الحالة إلى "${newStatus}".`);
   } catch (err) {
     console.error(err);
-    toast('⚠️ فشل تحديث الحالة');
+    toast('فشل تحديث الحالة.');
   } finally {
     sel.disabled = false;
   }
@@ -243,14 +269,14 @@ $('leads-tbody').addEventListener('click', async e => {
   btn.disabled = true;
   try {
     await window.SupabaseAPI.deleteLead(id);
-    allLeads = allLeads.filter(l => l.id !== id);
+    allLeads = allLeads.filter(l => String(l.id) !== String(id));
     updateKPIs();
     updateCharts();
     applyFilters();
-    toast('تم حذف الطلب 🗑️');
+    toast('تم حذف الطلب.');
   } catch (err) {
     console.error(err);
-    toast('⚠️ فشل حذف الطلب');
+    toast('فشل حذف الطلب.');
     btn.disabled = false;
   }
 });
@@ -281,7 +307,7 @@ $('export-btn').addEventListener('click', () => {
   a.download = `agent-store-leads-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('تم تصدير الملف 📄');
+  toast('تم تصدير الملف.');
 });
 
 // ---------- Toast ----------

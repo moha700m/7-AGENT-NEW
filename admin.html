@@ -32,18 +32,23 @@ tailwind.config = {
 </head>
 <body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen">
 
-<!-- ===== شاشة الدخول (PIN) ===== -->
+<!-- ===== شاشة الدخول الآمنة ===== -->
 <div id="login-screen" class="fixed inset-0 z-50 bg-night-900 flex items-center justify-center p-4">
   <form id="login-form" class="bg-white rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl">
     <span class="w-14 h-14 rounded-2xl bg-brand-500 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-lock text-white text-xl"></i></span>
     <h1 class="font-head font-900 text-2xl mb-1">لوحة تحكم Agent Store</h1>
-    <p class="text-slate-500 text-sm mb-6">أدخل رمز الدخول للمتابعة</p>
-    <input id="pin-input" type="password" inputmode="numeric" maxlength="6" dir="ltr"
-           class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-brand-500 mb-4"
-           placeholder="••••" autocomplete="off" aria-label="رمز الدخول">
-    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition">دخول</button>
-    <p id="pin-error" class="hidden text-red-600 text-sm font-bold mt-3">رمز غير صحيح، حاول مرة ثانية</p>
-    <p class="text-[11px] text-slate-400 mt-5">⚠️ حماية مبسطة على مستوى الواجهة فقط — الرمز الافتراضي: 2464</p>
+    <p class="text-slate-500 text-sm mb-6">سجّل الدخول بحساب الإدارة في Supabase</p>
+    <label for="email-input" class="sr-only">البريد الإلكتروني</label>
+    <input id="email-input" type="email" dir="ltr" required autocomplete="username"
+           class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-left focus:outline-none focus:border-brand-500 mb-3"
+           placeholder="admin@example.com">
+    <label for="password-input" class="sr-only">كلمة المرور</label>
+    <input id="password-input" type="password" dir="ltr" required autocomplete="current-password"
+           class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-left focus:outline-none focus:border-brand-500 mb-4"
+           placeholder="كلمة المرور">
+    <button id="login-submit" type="submit" class="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition">دخول آمن</button>
+    <p id="login-error" class="hidden text-red-600 text-sm font-bold mt-3" role="alert"></p>
+    <p class="text-[11px] text-slate-400 mt-5">الجلسة والصلاحيات تُدار بواسطة Supabase Auth وRLS.</p>
   </form>
 </div>
 
@@ -173,18 +178,6 @@ tailwind.config = {
 <!-- Toast -->
 <div id="toast" class="hidden fixed bottom-6 right-1/2 translate-x-1/2 z-50 bg-night-900 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-2xl" role="status"></div>
 
-<!-- Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Supabase Configuration -->
-<script>
-  // Initialize Supabase with environment variables
-  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co'; // Replace with your URL
-  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // Replace with your key
-  
-  if (window.supabase) {
-    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-</script>
 <script src="js/supabase-config.js"></script>
 <script src="js/admin.js"></script>
 </body>

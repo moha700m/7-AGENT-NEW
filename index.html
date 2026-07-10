@@ -468,18 +468,6 @@ tailwind.config = {
   <i class="fa-brands fa-whatsapp"></i>
 </a>
 
-<!-- Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Supabase Configuration -->
-<script>
-  // Initialize Supabase with environment variables
-  const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co'; // Replace with your URL
-  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // Replace with your key
-  
-  if (window.supabase) {
-    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-</script>
 <script src="js/supabase-config.js"></script>
 <script src="js/main.js"></script>
 </body>
