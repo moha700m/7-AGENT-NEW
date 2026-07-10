@@ -10,6 +10,8 @@ const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
 })
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const query = Object.fromEntries(request.nextUrl.searchParams)
