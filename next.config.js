@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'standalone',
   i18n: {
     locales: ['ar', 'en'],
     defaultLocale: 'ar',
@@ -14,7 +15,15 @@ const nextConfig = {
         { key: 'X-Frame-Options', value: 'DENY' },
         { key: 'X-XSS-Protection', value: '1; mode=block' },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
       ],
+    },
+  ],
+  redirects: async () => [
+    {
+      source: '/pricing',
+      destination: '/marketplace',
+      permanent: false,
     },
   ],
 };
