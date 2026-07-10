@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AgentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum GenerationStatus {
+  PENDING
+  COMPLETE
+  ERROR
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  passwordHash String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  agents    Agent[]
+  subscriptions Subscription[]
+  runs      AgentRun[]
+}
+
+model Category {
+  id     String  @id @default(cuid())
+  slug   String  @unique
+  name   String
+  nameAr String
+  agents Agent[]
+}
+
+model Agent {
+  id           String      @id @default(cuid())
+  slug         String      @unique
+  name         String
+  nameAr       String
+  summary      String
+  description  String
+  priceMonthly Int
+  status       AgentStatus @default(DRAFT)
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  ownerId      String
+  owner        User        @relation(fields: [ownerId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  subscriptions Subscription[]
+  runs          AgentRun[]
+
+  @@index([status, categoryId])
+}
+
+model AgentRun {
+  id             String           @id @default(cuid())
+  userId         String
+  agentId        String
+  model          String
+  prompt         String
+  output         String?
+  status         GenerationStatus @default(PENDING)
+  responseId     String?          @unique
+  inputTokens    Int?
+  outputTokens   Int?
+  totalTokens    Int?
+  errorMessage   String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent          Agent            @relation(fields: [agentId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+  @@index([agentId, createdAt])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  agentId              String
+  status               SubscriptionStatus @default(PENDING)
+  stripeSessionId      String             @unique
+  stripeSubscriptionId String?            @unique
+  stripeCustomerId     String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent                 Agent              @relation(fields: [agentId], references: [id], onDelete: Restrict)
+
+  @@index([userId, status])
+}
