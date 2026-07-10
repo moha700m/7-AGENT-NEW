@@ -1,30 +1,46 @@
-import { GET } from './route'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 
+const { findMany, count } = vi.hoisted(() => ({
+  findMany: vi.fn(),
+  count: vi.fn(),
+}))
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: { agent: { findMany, count } },
+}))
+
+import { GET } from './route'
+
 describe('GET /api/agents', () => {
-  it('should return a list of agents', async () => {
-    const request = new NextRequest('http://localhost/api/agents')
-    const response = await GET(request)
-    expect(response.status).toBe(200)
-    const json = await response.json()
-    expect(json).toHaveProperty('data')
-    expect(Array.isArray(json.data)).toBe(true)
+  beforeEach(() => {
+    findMany.mockReset().mockResolvedValue([])
+    count.mockReset().mockResolvedValue(0)
   })
 
-  it('should filter agents by query parameter', async () => {
-    const request = new NextRequest('http://localhost/api/agents?q=whatsapp')
-    const response = await GET(request)
+  it('returns a paginated agent list', async () => {
+    const response = await GET(new NextRequest('http://localhost/api/agents'))
     expect(response.status).toBe(200)
-    const json = await response.json()
-    expect(json).toHaveProperty('data')
-    expect(json.data.every((agent: any) => agent.name.toLowerCase().includes('whatsapp'))).toBe(true)
+    await expect(response.json()).resolves.toMatchObject({
+      data: [],
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 },
+    })
   })
 
-  it('should handle invalid query parameters', async () => {
-    const request = new NextRequest('http://localhost/api/agents?page=abc')
-    const response = await GET(request)
+  it('passes validated search filters to Prisma', async () => {
+    await GET(new NextRequest('http://localhost/api/agents?q=whatsapp&category=sales'))
+    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({
+        OR: expect.any(Array),
+        category: { slug: 'sales' },
+      }),
+    }))
+  })
+
+  it('rejects invalid pagination parameters', async () => {
+    const response = await GET(new NextRequest('http://localhost/api/agents?page=abc'))
     expect(response.status).toBe(400)
-    const json = await response.json()
-    expect(json).toHaveProperty('error')
+    await expect(response.json()).resolves.toMatchObject({ error: 'Validation failed' })
+    expect(findMany).not.toHaveBeenCalled()
   })
 })

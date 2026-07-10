@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { handleApiError, setSecurityHeaders } from '@/lib/api-utils'
 
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     const query = Object.fromEntries(request.nextUrl.searchParams)
     const params = querySchema.parse(query)
 
-    const where: any = { status: 'PUBLISHED' }
+    const where: Prisma.AgentWhereInput = { status: 'PUBLISHED' }
     
     if (params.q) {
       where.OR = [
