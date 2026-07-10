@@ -1,3 +1,25 @@
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
 export const dynamic = 'force-dynamic'
-export function GET() { return NextResponse.json({ status: 'ok' }, { headers: { 'Cache-Control': 'no-store' } }) }
+
+export async function GET() {
+  try {
+    await prisma.$queryRaw`SELECT 1`
+    
+    return NextResponse.json(
+      { status: 'ok', timestamp: new Date().toISOString() },
+      {
+        headers: {
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      }
+    )
+  } catch (error) {
+    return NextResponse.json(
+      { status: 'error', message: 'Database connection failed' },
+      { status: 503 }
+    )
+  }
+}
