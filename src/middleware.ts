@@ -32,7 +32,9 @@ export async function middleware(request: NextRequest) {
   const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID()
   const pathname = request.nextUrl.pathname
 
-  if (request.method === 'POST' && pathname === '/api/auth/register') {
+  const unsafeMethod = !['GET', 'HEAD', 'OPTIONS'].includes(request.method)
+  const sameOriginRequired = pathname === '/api/auth/register' || pathname.startsWith('/api/admin/')
+  if (unsafeMethod && sameOriginRequired) {
     const origin = request.headers.get('origin')
     if (origin && origin !== request.nextUrl.origin) {
       return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
