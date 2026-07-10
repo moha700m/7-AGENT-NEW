@@ -1,6 +1,5 @@
 {
-  "version": 2,
-  "public": true,
+  "version": 3,
   "buildCommand": "",
   "outputDirectory": ".",
   "headers": [
@@ -12,12 +11,6 @@
           "value": "public, max-age=3600, s-maxage=3600"
         }
       ]
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     }
   ]
 }
