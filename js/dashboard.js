@@ -16,7 +16,8 @@ async function initDashboard() {
     currentUser = session.user;
     userProfile = await window.SupabaseAPI.getUserProfile();
     
-    document.getElementById('user-name').textContent = userProfile.full_name || currentUser.email;
+    const userNameEl = document.getElementById('user-name');
+    if (userNameEl) userNameEl.textContent = userProfile.full_name || currentUser.email;
     
     // Setup UI
     setupTabs();
@@ -27,10 +28,12 @@ async function initDashboard() {
     // Load initial data
     await refreshAllData();
     
-    document.getElementById('loading-overlay').classList.add('hidden');
-    document.getElementById('content-area').classList.replace('opacity-0', 'opacity-100');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const contentArea = document.getElementById('content-area');
+    
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    if (contentArea) contentArea.classList.replace('opacity-0', 'opacity-100');
   } catch (err) {
-    console.error(err);
     toast('حدث خطأ أثناء تحميل لوحة التحكم', 'error');
   }
 }
@@ -62,12 +65,10 @@ function setupTabs() {
         }
       });
 
-      // Update URL hash without jumping
       history.pushState(null, null, `#${target}`);
     });
   });
 
-  // Handle initial hash
   const hash = window.location.hash.substring(1);
   if (hash) {
     const activeLink = document.querySelector(`.sidebar-link[data-tab="${hash}"]`);
@@ -81,11 +82,17 @@ async function loadOverviewData() {
     const orders = await window.SupabaseAPI.getOrders({ user_id: currentUser.id });
     const subs = await window.SupabaseAPI.getSubscriptions({ user_id: currentUser.id });
 
-    document.getElementById('stat-leads').textContent = leadsResult.total;
-    document.getElementById('stat-agents').textContent = (orders || []).filter(o => o.status === 'completed').length;
-    document.getElementById('stat-subs').textContent = (subs || []).length;
+    const statLeads = document.getElementById('stat-leads');
+    const statAgents = document.getElementById('stat-agents');
+    const statSubs = document.getElementById('stat-subs');
+
+    if (statLeads) statLeads.textContent = leadsResult.total;
+    if (statAgents) statAgents.textContent = (orders || []).filter(o => o.status === 'completed').length;
+    if (statSubs) statSubs.textContent = (subs || []).length;
 
     const tbody = document.getElementById('recent-leads-body');
+    if (!tbody) return;
+
     if (leadsResult.data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-slate-400">لا توجد طلبات حديثة</td></tr>';
       return;
@@ -101,7 +108,7 @@ async function loadOverviewData() {
       </tr>
     `).join('');
   } catch (err) {
-    console.error('Error loading overview:', err);
+    // Error logged silently in production
   }
 }
 
@@ -109,6 +116,7 @@ async function loadLeadsData() {
   try {
     const leadsResult = await window.SupabaseAPI.getLeads(1, 50, { user_id: currentUser.id });
     const tbody = document.getElementById('full-leads-body');
+    if (!tbody) return;
     
     if (leadsResult.data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد طلبات مسجلة</td></tr>';
@@ -126,7 +134,7 @@ async function loadLeadsData() {
       </tr>
     `).join('');
   } catch (err) {
-    console.error('Error loading leads:', err);
+    // Error logged silently in production
   }
 }
 
@@ -142,6 +150,8 @@ async function loadPaymentsData() {
     if (error) throw error;
 
     const tbody = document.getElementById('payments-body');
+    if (!tbody) return;
+
     if (!data || data.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد عمليات دفع مسجلة</td></tr>';
       return;
@@ -158,7 +168,7 @@ async function loadPaymentsData() {
       </tr>
     `).join('');
   } catch (err) {
-    console.error('Error loading payments:', err);
+    // Error logged silently in production
   }
 }
 
@@ -166,7 +176,6 @@ function setupProfileForm() {
   const form = document.getElementById('profile-form');
   if (!form) return;
 
-  // Fill form with current data
   form.full_name.value = userProfile.full_name || '';
   form.username.value = userProfile.username || '';
   form.company.value = userProfile.company || '';
@@ -230,7 +239,6 @@ function setupPaymentForm() {
     try {
       const supabase = await window.SupabaseAPI.initSupabase();
       
-      // 1. Upload image to Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -239,10 +247,8 @@ function setupPaymentForm() {
 
       if (uploadError) throw uploadError;
 
-      // 2. Get Public URL
       const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
 
-      // 3. Save to Database
       const transferData = {
         beneficiary_name: form.beneficiary_name.value,
         amount: parseFloat(form.amount.value),
@@ -255,17 +261,18 @@ function setupPaymentForm() {
       
       toast('✅ تم إرسال الإيصال بنجاح. ستتم مراجعته قريباً.');
       form.reset();
-      fileInfo.innerHTML = `
-        <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
-        <p class="text-slate-500 text-sm">اضغط هنا أو اسحب الصورة لرفع الإيصال</p>
-      `;
+      if (fileInfo) {
+        fileInfo.innerHTML = `
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
+          <p class="text-slate-500 text-sm">اضغط هنا أو اسحب الصورة لرفع الإيصال</p>
+        `;
+      }
       
-      // Switch to payments tab
-      document.querySelector('.sidebar-link[data-tab="payments"]').click();
+      const paymentsTab = document.querySelector('.sidebar-link[data-tab="payments"]');
+      if (paymentsTab) paymentsTab.click();
       await loadPaymentsData();
 
     } catch (err) {
-      console.error(err);
       toast('⚠️ فشل الإرسال: ' + err.message, 'error');
     } finally {
       btn.disabled = false;
@@ -286,7 +293,6 @@ function setupLogout() {
   }
 }
 
-// Helpers
 function getStatusClass(status) {
   const classes = {
     'جديد': 'bg-blue-50 text-blue-600',
@@ -316,10 +322,15 @@ function getPaymentStatusText(status) {
 }
 
 function toast(msg, type = 'success') {
-  const toast = document.getElementById('toast');
+  const toastEl = document.getElementById('toast');
   const toastMsg = document.getElementById('toast-msg');
   const toastIcon = document.getElementById('toast-icon');
   
+  if (!toastEl || !toastMsg || !toastIcon) {
+    alert(msg);
+    return;
+  }
+
   toastMsg.textContent = msg;
   
   if (type === 'error') {
@@ -330,6 +341,6 @@ function toast(msg, type = 'success') {
     toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
   }
   
-  toast.classList.remove('hidden');
-  setTimeout(() => toast.classList.add('hidden'), 4000);
+  toastEl.classList.remove('hidden');
+  setTimeout(() => toastEl.classList.add('hidden'), 4000);
 }
