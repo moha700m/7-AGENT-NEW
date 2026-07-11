@@ -6,6 +6,19 @@ let userProfile = null;
 
 document.addEventListener('DOMContentLoaded', initDashboard);
 document.addEventListener('DOMContentLoaded', () => {
+  window.setTimeout(() => {
+    const overlay = document.getElementById('loading-overlay');
+    const content = document.getElementById('content-area');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      overlay.classList.add('hidden');
+      content?.classList.replace('opacity-0', 'opacity-100');
+      if (content && !document.getElementById('dashboard-load-warning')) {
+        content.insertAdjacentHTML('afterbegin', '<div id="dashboard-load-warning" class="dashboard-warning" role="alert"><i class="fa-solid fa-clock"></i><div><strong>استغرق الاتصال وقتاً أطول من المتوقع</strong><p>يمكنك استخدام لوحة التحكم، وسنواصل محاولة تحميل البيانات.</p></div></div>');
+      }
+    }
+  }, 10000);
+});
+document.addEventListener('DOMContentLoaded', () => {
   const button = document.getElementById('mobile-menu-btn');
   const sidebar = document.getElementById('customer-sidebar');
   if (button && sidebar) button.addEventListener('click', () => sidebar.classList.toggle('open'));
@@ -22,7 +35,7 @@ async function initDashboard() {
     userProfile = await window.SupabaseAPI.getUserProfile();
     
     const userNameEl = document.getElementById('user-name');
-    if (userNameEl) userNameEl.textContent = userProfile.full_name || currentUser.email;
+    if (userNameEl) userNameEl.textContent = userProfile?.full_name || currentUser.email;
     
     // Setup UI
     setupTabs();
@@ -40,7 +53,14 @@ async function initDashboard() {
     if (loadingOverlay) loadingOverlay.classList.add('hidden');
     if (contentArea) contentArea.classList.replace('opacity-0', 'opacity-100');
   } catch (err) {
+    console.error('Dashboard initialization failed:', err);
+    const contentArea = document.getElementById('content-area');
+    if (contentArea && !document.getElementById('dashboard-load-warning')) {
+      contentArea.insertAdjacentHTML('afterbegin', '<div id="dashboard-load-warning" class="dashboard-warning" role="alert"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>تعذر تحميل بعض البيانات</strong><p>ظهرت لوحة التحكم، لكن بعض الأقسام لم تتصل بقاعدة البيانات. جرّب تحديث الصفحة أو راجع إعدادات Supabase.</p></div></div>');
+    }
     toast('حدث خطأ أثناء تحميل لوحة التحكم', 'error');
+    document.getElementById('loading-overlay')?.classList.add('hidden');
+    contentArea?.classList.replace('opacity-0', 'opacity-100');
   }
 }
 
@@ -186,10 +206,11 @@ function setupProfileForm() {
   const form = document.getElementById('profile-form');
   if (!form) return;
 
-  form.full_name.value = userProfile.full_name || '';
-  form.username.value = userProfile.username || '';
-  form.company.value = userProfile.company || '';
-  form.phone.value = userProfile.phone || '';
+  const profile = userProfile || {};
+  form.full_name.value = profile.full_name || '';
+  form.username.value = profile.username || '';
+  form.company.value = profile.company || '';
+  form.phone.value = profile.phone || '';
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
