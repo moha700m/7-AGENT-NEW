@@ -27,9 +27,12 @@ tailwind.config = {
 }
 </script>
 <style>
-  .sidebar-link { @apply flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-400 hover:bg-white/5 hover:text-white; }
+  .sidebar-link { @apply flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-400 hover:bg-white/5 hover:text-white cursor-pointer; }
   .sidebar-link.active { @apply bg-brand-500 text-white shadow-lg shadow-brand-500/20; }
   .card { @apply bg-white rounded-3xl shadow-sm border border-slate-100 p-6; }
+  .tab-content { @apply animate-fade-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 </style>
 </head>
 <body class="font-body bg-slate-50 text-slate-800 antialiased min-h-screen flex">
@@ -44,13 +47,15 @@ tailwind.config = {
   </div>
   
   <nav class="flex-1 px-4 space-y-2 mt-4">
-    <a href="#overview" class="sidebar-link active" data-tab="overview"><i class="fa-solid fa-house"></i> نظرة عامة</a>
-    <a href="#leads" class="sidebar-link" data-tab="leads"><i class="fa-solid fa-inbox"></i> طلباتي</a>
-    <a href="#agents" class="sidebar-link" data-tab="agents"><i class="fa-solid fa-robot"></i> وكلائي</a>
-    <a href="#subscriptions" class="sidebar-link" data-tab="subscriptions"><i class="fa-solid fa-calendar-check"></i> الاشتراكات</a>
-    <a href="#payments" class="sidebar-link" data-tab="payments"><i class="fa-solid fa-money-bill-transfer"></i> المدفوعات</a>
-    <a href="#profile" class="sidebar-link" data-tab="profile"><i class="fa-solid fa-user-gear"></i> الملف الشخصي</a>
-    <a href="#payment-upload" class="sidebar-link" data-tab="payment-upload"><i class="fa-solid fa-upload"></i> رفع إيصال التحويل</a>
+    <a data-tab="overview" class="sidebar-link active"><i class="fa-solid fa-house"></i> نظرة عامة</a>
+    <a data-tab="leads" class="sidebar-link"><i class="fa-solid fa-inbox"></i> طلباتي</a>
+    <a data-tab="agents" class="sidebar-link"><i class="fa-solid fa-robot"></i> وكلائي</a>
+    <a data-tab="subscriptions" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> الاشتراكات</a>
+    <a data-tab="payments" class="sidebar-link"><i class="fa-solid fa-money-bill-transfer"></i> المدفوعات</a>
+    <a data-tab="profile" class="sidebar-link"><i class="fa-solid fa-user-gear"></i> الملف الشخصي</a>
+    <div class="pt-4 border-t border-white/5 mt-4">
+      <a data-tab="payment-upload" class="sidebar-link bg-brand-500/10 text-brand-500"><i class="fa-solid fa-upload"></i> رفع إيصال التحويل</a>
+    </div>
   </nav>
 
   <div class="p-4 border-t border-white/5">
@@ -62,15 +67,6 @@ tailwind.config = {
 
 <!-- Main Content -->
 <main class="flex-1 lg:mr-64 p-4 lg:p-8">
-  <!-- Mobile Header -->
-  <header class="lg:hidden flex items-center justify-between mb-8 bg-white p-4 rounded-2xl shadow-sm">
-    <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
-      <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-white text-sm"></i></span>
-      Agent <span class="text-brand-500">Store</span>
-    </a>
-    <button id="mobile-menu-btn" class="text-2xl"><i class="fa-solid fa-bars"></i></button>
-  </header>
-
   <div id="loading-overlay" class="fixed inset-0 bg-white z-[60] flex items-center justify-center">
     <div class="text-center">
       <div class="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -83,12 +79,6 @@ tailwind.config = {
       <div>
         <h1 class="font-head font-900 text-3xl mb-1">أهلاً، <span id="user-name">...</span></h1>
         <p class="text-slate-500">مرحباً بك في لوحة تحكم Agent Store</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <button class="relative w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-brand-500 transition">
-          <i class="fa-solid fa-bell"></i>
-          <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
       </div>
     </div>
 
@@ -120,9 +110,7 @@ tailwind.config = {
                 <th class="pb-4 font-medium">الحالة</th>
               </tr>
             </thead>
-            <tbody id="recent-leads-body">
-              <!-- Leads will be injected here -->
-            </tbody>
+            <tbody id="recent-leads-body"></tbody>
           </table>
         </div>
       </div>
@@ -173,20 +161,18 @@ tailwind.config = {
     <!-- Payments Tab -->
     <section id="tab-payments" class="tab-content hidden space-y-6">
       <div class="card">
-        <h3 class="font-head font-800 text-xl mb-6">سجل المدفوعات</h3>
+        <h3 class="font-head font-800 text-xl mb-6">سجل المدفوعات والتحويلات</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-right">
             <thead>
               <tr class="text-slate-400 text-sm border-b border-slate-50">
-                <th class="pb-4 font-medium">المبلغ</th>
-                <th class="pb-4 font-medium">الطريقة</th>
-                <th class="pb-4 font-medium">التاريخ</th>
-                <th class="pb-4 font-medium">الحالة</th>
+                <th class="pb-4 px-4 font-medium">المبلغ</th>
+                <th class="pb-4 px-4 font-medium">المحول</th>
+                <th class="pb-4 px-4 font-medium">التاريخ</th>
+                <th class="pb-4 px-4 font-medium">الحالة</th>
               </tr>
             </thead>
-            <tbody id="payments-body">
-              <tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد عمليات دفع مسجلة</td></tr>
-            </tbody>
+            <tbody id="payments-body"></tbody>
           </table>
         </div>
       </div>
@@ -247,190 +233,30 @@ tailwind.config = {
           </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">صورة الإيصال</label>
-            <input type="file" id="receipt-file" accept="image/*" required class="w-full border-2 border-dashed border-slate-200 rounded-xl px-4 py-8 text-center cursor-pointer hover:border-brand-500 transition">
+            <div id="drop-zone" class="w-full border-2 border-dashed border-slate-200 rounded-xl px-4 py-8 text-center cursor-pointer hover:border-brand-500 transition relative">
+              <input type="file" id="receipt-file" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+              <div id="file-info">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
+                <p class="text-slate-500 text-sm">اضغط هنا أو اسحب الصورة لرفع الإيصال</p>
+              </div>
+            </div>
           </div>
-          <button type="submit" id="payment-submit-btn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-8 py-3 rounded-xl transition w-full sm:w-auto">إرسال الإيصال للمراجعة</button>
+          <button type="submit" id="payment-submit-btn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-8 py-3 rounded-xl transition w-full sm:w-auto flex items-center justify-center gap-2">
+            <span>إرسال الإيصال للمراجعة</span>
+          </button>
         </form>
       </div>
     </section>
   </div>
 </main>
 
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-night-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[300px]">
+  <div id="toast-icon" class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white"><i class="fa-solid fa-check"></i></div>
+  <p id="toast-msg" class="font-bold text-sm"></p>
+</div>
+
 <script src="js/supabase-config.js"></script>
-<script>
-  let currentUser = null;
-  let userProfile = null;
-
-  async function initDashboard() {
-    try {
-      const session = await window.SupabaseAPI.getSession();
-      if (!session) {
-        window.location.href = 'login.html';
-        return;
-      }
-      currentUser = session.user;
-      userProfile = await window.SupabaseAPI.getUserProfile();
-      
-      document.getElementById('user-name').textContent = userProfile.full_name || currentUser.email;
-      
-      // Load initial data
-      await loadOverviewData();
-      
-      // Setup UI
-      setupTabs();
-      setupProfileForm();
-      setupPaymentForm();
-      await loadLeadsData();
-      
-      document.getElementById('loading-overlay').classList.add('hidden');
-      document.getElementById('content-area').classList.replace('opacity-0', 'opacity-100');
-    } catch (err) {
-      console.error(err);
-      alert('حدث خطأ أثناء تحميل لوحة التحكم');
-    }
-  }
-
-  async function loadOverviewData() {
-    try {
-      const leadsResult = await window.SupabaseAPI.getLeads(1, 5, { user_id: currentUser.id });
-      const orders = await window.SupabaseAPI.getOrders({ user_id: currentUser.id });
-      const subs = await window.SupabaseAPI.getSubscriptions({ user_id: currentUser.id });
-
-      document.getElementById('stat-leads').textContent = leadsResult.total;
-      document.getElementById('stat-agents').textContent = (orders || []).filter(o => o.status === 'completed').length;
-      document.getElementById('stat-subs').textContent = (subs || []).length;
-
-      const tbody = document.getElementById('recent-leads-body');
-      tbody.innerHTML = leadsResult.data.map(lead => `
-        <tr class="border-b border-slate-50">
-          <td class="py-4 font-bold">${lead.agent_type || 'غير محدد'}</td>
-          <td class="py-4 text-slate-500 text-sm">${new Date(lead.created_at).toLocaleDateString('ar-SA')}</td>
-          <td class="py-4">
-            <span class="px-3 py-1 rounded-full text-xs font-bold ${
-              lead.status === 'جديد' ? 'bg-blue-50 text-blue-600' : 
-              lead.status === 'تم البيع' ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-500'
-            }">${lead.status}</span>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="3" class="py-8 text-center text-slate-400">لا توجد طلبات حالياً</td></tr>';
-    } catch (e) { console.error('Error loading overview:', e); }
-  }
-
-  async function loadLeadsData() {
-    try {
-      const leadsResult = await window.SupabaseAPI.getLeads(1, 50, { user_id: currentUser.id });
-      const tbody = document.getElementById('full-leads-body');
-      if (tbody) {
-        tbody.innerHTML = leadsResult.data.map(lead => `
-          <tr class="border-b border-slate-50">
-            <td class="py-4 font-bold">${lead.agent_type || 'غير محدد'}</td>
-            <td class="py-4 text-slate-500 text-sm">${lead.company || '—'}</td>
-            <td class="py-4 text-slate-500 text-sm">${new Date(lead.created_at).toLocaleDateString('ar-SA')}</td>
-            <td class="py-4">
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${
-                lead.status === 'جديد' ? 'bg-blue-50 text-blue-600' : 
-                lead.status === 'تم البيع' ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-500'
-              }">${lead.status}</span>
-            </td>
-          </tr>
-        `).join('') || '<tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد طلبات حالياً</td></tr>';
-      }
-    } catch (e) { console.error('Error loading leads:', e); }
-  }
-
-  function setupTabs() {
-    const links = document.querySelectorAll('.sidebar-link[data-tab]');
-    const contents = document.querySelectorAll('.tab-content');
-
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tab = link.dataset.tab;
-        
-        links.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        
-        contents.forEach(c => c.classList.add('hidden'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      });
-    });
-  }
-
-  function setupPaymentForm() {
-    const form = document.getElementById('payment-form');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('payment-submit-btn');
-      const fileInput = document.getElementById('receipt-file');
-      
-      if (!fileInput.files[0]) return alert('يرجى اختيار صورة الإيصال');
-      
-      btn.disabled = true;
-      btn.textContent = 'جارٍ الرفع...';
-
-      try {
-        // In a real app, we would upload to Supabase Storage first
-        // For this demo, we'll simulate the URL
-        const receiptUrl = 'https://placehold.co/600x800?text=Receipt'; 
-        
-        await window.SupabaseAPI.submitBankTransfer({
-          beneficiary_name: form.beneficiary_name.value,
-          bank_name: 'البنك الأهلي',
-          iban: 'SA00...',
-          amount: parseFloat(form.amount.value),
-          receipt_url: receiptUrl,
-          status: 'pending'
-        });
-
-        alert('تم إرسال الإيصال بنجاح، سيتم مراجعته من قبل الإدارة');
-        form.reset();
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'إرسال الإيصال للمراجعة';
-      }
-    });
-  }
-
-  function setupProfileForm() {
-    const form = document.getElementById('profile-form');
-    if (userProfile) {
-      form.full_name.value = userProfile.full_name || '';
-      form.username.value = userProfile.username || '';
-      form.company.value = userProfile.company || '';
-      form.phone.value = userProfile.phone || '';
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = form.querySelector('button');
-      btn.disabled = true;
-      btn.textContent = 'جارٍ الحفظ...';
-
-      try {
-        await window.SupabaseAPI.updateProfile({
-          full_name: form.full_name.value,
-          username: form.username.value,
-          company: form.company.value,
-          phone: form.phone.value
-        });
-        alert('تم تحديث الملف الشخصي بنجاح');
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'حفظ التغييرات';
-      }
-    });
-  }
-
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await window.SupabaseAPI.signOut();
-    window.location.href = 'index.html';
-  });
-
-  initDashboard();
-</script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>

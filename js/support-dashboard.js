@@ -1,4 +1,4 @@
-/* ====== Agent Store Support Dashboard Logic ====== */
+/* ====== Agent Store Support Dashboard Logic (SaaS Edition) ====== */
 'use strict';
 
 const $ = id => document.getElementById(id);
@@ -110,7 +110,7 @@ async function loadTabData(tabId) {
       case 'leads': await loadLeads(); break;
       case 'orders': await loadOrders(); break;
       case 'transfers': await loadTransfers(); break;
-      case 'agents': await loadAgents(); break;
+      case 'agents': if (typeof loadAgents === 'function') await loadAgents(); break;
       case 'subscriptions': await loadSubscriptions(); break;
       case 'audit': await loadAuditLogs(); break;
     }
@@ -124,7 +124,6 @@ async function loadTabData(tabId) {
 // ============================================
 
 async function loadOverview() {
-  // Stats
   const { count: uCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
   const { count: lCount } = await supabase.from('leads').select('*', { count: 'exact', head: true });
   const { count: oCount, data: orders } = await supabase.from('orders').select('amount').eq('status', 'completed');
@@ -138,7 +137,7 @@ async function loadOverview() {
 
   // Recent Users
   const { data: recentUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false }).limit(5);
-  $('recent-users-list').innerHTML = recentUsers.map(u => `
+  $('recent-users-list').innerHTML = (recentUsers || []).map(u => `
     <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-transparent hover:border-brand-500/20 transition">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-brand-500">
@@ -155,7 +154,7 @@ async function loadOverview() {
 
   // Recent Logs
   const { data: recentLogs } = await supabase.from('activity_logs').select('*, users(full_name)').order('created_at', { ascending: false }).limit(5);
-  $('recent-logs-list').innerHTML = recentLogs.map(log => `
+  $('recent-logs-list').innerHTML = (recentLogs || []).map(log => `
     <div class="flex items-start gap-3 p-3 border-b border-slate-50 last:border-0">
       <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-500 flex-shrink-0">
         <i class="fa-solid fa-${getActivityIcon(log.action)}"></i>
@@ -170,8 +169,7 @@ async function loadOverview() {
 
 async function loadUsers() {
   const { data } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-  $('users-count').textContent = `${data.length} مستخدم`;
-  $('users-table-body').innerHTML = data.map(u => `
+  $('users-table-body').innerHTML = (data || []).map(u => `
     <tr>
       <td class="table-cell">
         <div class="flex items-center gap-3">
@@ -194,7 +192,7 @@ async function loadUsers() {
 
 async function loadLeads() {
   const { data } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-  $('leads-table-body').innerHTML = data.map(l => `
+  $('leads-table-body').innerHTML = (data || []).map(l => `
     <tr>
       <td class="table-cell">
         <p class="font-bold">${l.name}</p>
@@ -215,10 +213,10 @@ async function loadLeads() {
 
 async function loadTransfers() {
   const { data } = await supabase.from('bank_transfers').select('*, users(full_name, email)').order('created_at', { ascending: false });
-  const pending = data.filter(t => t.status === 'pending').length;
+  const pending = (data || []).filter(t => t.status === 'pending').length;
   $('pending-transfers-count').textContent = `${pending} بانتظار المراجعة`;
   
-  $('transfers-table-body').innerHTML = data.map(t => `
+  $('transfers-table-body').innerHTML = (data || []).map(t => `
     <tr>
       <td class="table-cell">
         <p class="font-bold text-xs">${t.beneficiary_name}</p>
@@ -236,8 +234,10 @@ async function loadTransfers() {
       </td>
       <td class="table-cell">
         ${t.status === 'pending' ? `
-          <button onclick="approveTransfer('${t.id}')" class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition" title="قبول"><i class="fa-solid fa-check"></i></button>
-          <button onclick="rejectTransfer('${t.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition" title="رفض"><i class="fa-solid fa-xmark"></i></button>
+          <div class="flex gap-2">
+            <button onclick="approveTransfer('${t.id}')" class="w-8 h-8 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center justify-center" title="قبول"><i class="fa-solid fa-check"></i></button>
+            <button onclick="rejectTransfer('${t.id}')" class="w-8 h-8 bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center justify-center" title="رفض"><i class="fa-solid fa-xmark"></i></button>
+          </div>
         ` : '—'}
       </td>
     </tr>
@@ -246,7 +246,9 @@ async function loadTransfers() {
 
 async function loadAuditLogs() {
   const { data } = await supabase.from('activity_logs').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(100);
-  $('audit-logs-full').innerHTML = data.map(log => `
+  const container = $('audit-logs-full');
+  if (!container) return;
+  container.innerHTML = (data || []).map(log => `
     <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-50 shadow-sm hover:border-brand-500/10 transition">
       <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
         <i class="fa-solid fa-${getActivityIcon(log.action)}"></i>
@@ -262,6 +264,42 @@ async function loadAuditLogs() {
   `).join('');
 }
 
+async function loadOrders() {
+  const { data } = await supabase.from('orders').select('*, users(full_name, email)').order('order_date', { ascending: false });
+  $('orders-table-body').innerHTML = (data || []).map(o => `
+    <tr>
+      <td class="table-cell font-mono text-xs">#${o.id}</td>
+      <td class="table-cell">
+        <p class="font-bold text-xs">${o.users?.full_name || '—'}</p>
+      </td>
+      <td class="table-cell font-bold text-brand-600">${o.total_amount} ر.س</td>
+      <td class="table-cell text-xs text-slate-400">${new Date(o.order_date).toLocaleDateString('ar-SA')}</td>
+      <td class="table-cell"><span class="badge bg-green-50 text-green-600">${o.status}</span></td>
+      <td class="table-cell">
+        <button class="text-slate-400 hover:text-brand-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function loadSubscriptions() {
+  const { data } = await supabase.from('subscriptions').select('*, users(full_name, email), plans(name)').order('created_at', { ascending: false });
+  $('subscriptions-table-body').innerHTML = (data || []).map(s => `
+    <tr>
+      <td class="table-cell">
+        <p class="font-bold text-xs">${s.users?.full_name || '—'}</p>
+      </td>
+      <td class="table-cell text-xs font-bold">${s.plans?.name || '—'}</td>
+      <td class="table-cell text-xs text-slate-400">${new Date(s.start_date).toLocaleDateString('ar-SA')}</td>
+      <td class="table-cell text-xs text-slate-400">${new Date(s.end_date).toLocaleDateString('ar-SA')}</td>
+      <td class="table-cell"><span class="badge ${s.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}">${s.status}</span></td>
+      <td class="table-cell">
+        <button class="text-slate-400 hover:text-brand-500"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
 // ============================================
 // ACTIONS
 // ============================================
@@ -271,11 +309,20 @@ window.approveTransfer = async (id) => {
   try {
     const { error } = await supabase.from('bank_transfers').update({ 
       status: 'approved', 
-      processed_at: new Date().toISOString(),
-      processed_by: currentAdmin.id 
+      updated_at: new Date().toISOString()
     }).eq('id', id);
     
     if (error) throw error;
+    
+    // Log activity
+    await supabase.from('activity_logs').insert({
+      user_id: currentAdmin.id,
+      action: 'approve',
+      resource_type: 'bank_transfer',
+      resource_id: id.toString(),
+      description: `تم قبول التحويل البنكي رقم ${id}`
+    });
+
     toast('✅ تم قبول التحويل وتحديث الحالة');
     loadTransfers();
     loadOverview();
@@ -291,11 +338,21 @@ window.rejectTransfer = async (id) => {
   try {
     const { error } = await supabase.from('bank_transfers').update({ 
       status: 'rejected', 
-      processed_at: new Date().toISOString(),
-      processed_by: currentAdmin.id 
+      admin_notes: reason,
+      updated_at: new Date().toISOString()
     }).eq('id', id);
     
     if (error) throw error;
+
+    // Log activity
+    await supabase.from('activity_logs').insert({
+      user_id: currentAdmin.id,
+      action: 'reject',
+      resource_type: 'bank_transfer',
+      resource_id: id.toString(),
+      description: `تم رفض التحويل البنكي رقم ${id}. السبب: ${reason || 'لم يذكر'}`
+    });
+
     toast('❌ تم رفض التحويل');
     loadTransfers();
   } catch (err) {
@@ -323,20 +380,7 @@ function getStatusBadgeClass(status) {
 }
 
 function toast(msg, type = 'success') {
-  const el = $('toast');
-  const icon = $('toast-icon');
-  $('toast-msg').textContent = msg;
-  
-  if (type === 'error') {
-    icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-    icon.className = 'w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white';
-  } else {
-    icon.innerHTML = '<i class="fa-solid fa-check"></i>';
-    icon.className = 'w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white';
-  }
-  
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 4000);
+  alert(msg); // Simple alert for admin dashboard
 }
 
 function setupEventListeners() {
@@ -347,31 +391,12 @@ function setupEventListeners() {
   });
 
   $('logout-btn').addEventListener('click', async () => {
-    if (confirm('هل تريد تسجيل الخروج من لوحة الإدارة؟')) {
+    if (confirm('هل تريد تسجيل الخروج؟')) {
       await window.SupabaseAPI.signOut();
-      window.location.href = '../login.html';
+      window.location.href = '../index.html';
     }
-  });
-
-  $('users-search').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#users-table-body tr');
-    let found = 0;
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      if (text.includes(term)) {
-        row.style.display = '';
-        found++;
-      } else {
-        row.style.display = 'none';
-      }
-    });
-    $('users-empty').classList.toggle('hidden', found > 0 || term === '');
   });
 }
 
-// ============================================
-// START
-// ============================================
-
+// Start
 document.addEventListener('DOMContentLoaded', init);
