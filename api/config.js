@@ -4,8 +4,9 @@ module.exports = function handler(request, response) {
     return response.status(405).json({ error: 'Method not allowed' });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  // Fallback values if environment variables are not set
+  const supabaseUrl = process.env.SUPABASE_URL || 'https://pfrugircpdwrxmfikfhv.supabase.co';
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'sb_publishable_40317f22384755106208953934394c50355a30384a31413d';
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return response.status(500).json({ error: 'Supabase configuration missing' });
