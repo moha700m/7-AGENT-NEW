@@ -35,6 +35,7 @@ async function showDashboard() {
   loginScreen.classList.add('hidden');
   dashboard.classList.remove('hidden');
   await loadLeads();
+  await window.DashboardData?.loadAdmin();
 }
 
 function showLoginError(message) {
@@ -115,6 +116,7 @@ async function loadLeads() {
 
 $('refresh-btn').addEventListener('click', () => { 
   loadLeads(); 
+  window.DashboardData?.loadAdmin();
   toast('تم تحديث البيانات.');
 });
 
