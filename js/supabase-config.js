@@ -172,7 +172,6 @@ async function getUserProfile() {
 
   return data;
 }
-}
 
 async function updateProfile(profileData) {
   const client = await initSupabase();

@@ -32,6 +32,7 @@ async function initDashboard() {
     
     // Load initial data
     await refreshAllData();
+    await window.DashboardData?.loadCustomer(currentUser.id);
     
     const loadingOverlay = document.getElementById('loading-overlay');
     const contentArea = document.getElementById('content-area');
