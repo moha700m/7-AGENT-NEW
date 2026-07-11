@@ -7,12 +7,13 @@ import { prisma } from '@/lib/prisma'
 
 const runSchema = z.object({ prompt: z.string().trim().min(1).max(4000) })
 
-export async function POST(request: Request, { params }: { params: { slug: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const parsed = runSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: 'Invalid prompt' }, { status: 400 })
-  const agent = await prisma.agent.findFirst({ where: { slug: params.slug, status: 'PUBLISHED' } })
+  const { slug } = await params
+  const agent = await prisma.agent.findFirst({ where: { slug, status: 'PUBLISHED' } })
   if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
   const allowed = session.user.role === 'ADMIN' || agent.ownerId === session.user.id || await prisma.subscription.count({ where: { userId: session.user.id, agentId: agent.id, status: 'ACTIVE' } }) > 0
   if (!allowed) return NextResponse.json({ error: 'Active subscription required' }, { status: 403 })

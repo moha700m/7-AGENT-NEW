@@ -1,12 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
-  i18n: {
-    locales: ['ar', 'en'],
-    defaultLocale: 'ar',
-  },
   headers: async () => [
     {
       source: '/:path*',

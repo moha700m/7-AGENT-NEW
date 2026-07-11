@@ -9,13 +9,15 @@ import { AgentRunner } from '@/components/agent-runner'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const agent = await prisma.agent.findFirst({ where: { slug: params.slug, status: 'PUBLISHED' }, select: { nameAr: true, summary: true } })
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const agent = await prisma.agent.findFirst({ where: { slug, status: 'PUBLISHED' }, select: { nameAr: true, summary: true } })
   return agent ? { title: agent.nameAr, description: agent.summary } : { title: 'الوكيل غير موجود' }
 }
 
-export default async function AgentDetails({ params }: { params: { slug: string } }) {
-  const agent = await prisma.agent.findFirst({ where: { slug: params.slug, status: 'PUBLISHED' }, include: { category: true } })
+export default async function AgentDetails({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const agent = await prisma.agent.findFirst({ where: { slug, status: 'PUBLISHED' }, include: { category: true } })
   if (!agent) notFound()
   const session = await getServerSession(authOptions)
   const canRun = Boolean(session && (session.user.role === 'ADMIN' || agent.ownerId === session.user.id || await prisma.subscription.count({ where: { userId: session.user.id, agentId: agent.id, status: 'ACTIVE' } }) > 0))

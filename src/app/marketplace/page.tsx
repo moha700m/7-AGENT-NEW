@@ -7,9 +7,10 @@ import { SiteFooter } from '@/components/site-footer'
 export const metadata = { title: 'سوق الوكلاء', description: 'تصفح وكلاء الذكاء الاصطناعي حسب المهمة والتصنيف.' }
 export const dynamic = 'force-dynamic'
 
-export default async function Marketplace({ searchParams }: { searchParams: { q?: string; category?: string } }) {
-  const q = searchParams.q?.trim().slice(0, 100) ?? ''
-  const category = searchParams.category?.trim().slice(0, 60) ?? ''
+export default async function Marketplace({ searchParams }: { searchParams: Promise<{ q?: string; category?: string }> }) {
+  const filters = await searchParams
+  const q = filters.q?.trim().slice(0, 100) ?? ''
+  const category = filters.category?.trim().slice(0, 60) ?? ''
   const where: Prisma.AgentWhereInput = { status: 'PUBLISHED' }
   if (q) where.OR = [{ name: { contains: q, mode: 'insensitive' } }, { nameAr: { contains: q, mode: 'insensitive' } }, { summary: { contains: q, mode: 'insensitive' } }]
   if (category) where.category = { slug: category }
