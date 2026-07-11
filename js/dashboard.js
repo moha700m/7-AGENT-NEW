@@ -74,6 +74,10 @@ function setupTabs() {
     });
   });
 
+  document.querySelectorAll('[data-open-marketplace]').forEach(button => button.addEventListener('click', () => {
+    document.querySelector('.sidebar-link[data-tab="marketplace"]')?.click();
+  }));
+
   const hash = window.location.hash.substring(1);
   if (hash) {
     const activeLink = document.querySelector(`.sidebar-link[data-tab="${hash}"]`);

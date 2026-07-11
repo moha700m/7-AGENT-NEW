@@ -10,6 +10,23 @@ let agentChart = null;
 let planChart = null;
 
 const $ = id => document.getElementById(id);
+
+function setupAdminNavigation() {
+  const main = document.querySelector('.admin-main');
+  const links = document.querySelectorAll('[data-admin-tab]');
+  if (!main || !links.length) return;
+  const activate = page => {
+    main.dataset.page = page;
+    links.forEach(link => link.classList.toggle('active', link.dataset.adminTab === page));
+    history.replaceState(null, '', `#${page}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  links.forEach(link => link.addEventListener('click', event => { event.preventDefault(); activate(link.dataset.adminTab); }));
+  const initial = location.hash.slice(1);
+  activate([...links].some(link => link.dataset.adminTab === initial) ? initial : 'overview');
+}
+
+document.addEventListener('DOMContentLoaded', setupAdminNavigation);
 const loginScreen = $('login-screen');
 const dashboard = $('dashboard');
 
