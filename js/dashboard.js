@@ -1,376 +1,346 @@
-/* ====== Dashboard JavaScript ====== */
+/* ====== User Dashboard Logic (SaaS Version) ====== */
 'use strict';
 
-const $ = id => document.getElementById(id);
-let currentLeadsPage = 1;
-let leadsPerPage = 10;
-let allLeads = [];
-let agentChart = null;
-let planChart = null;
+let currentUser = null;
+let userProfile = null;
 
-// ============================================
-// NAVIGATION
-// ============================================
-
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', e => {
-    e.preventDefault();
-    const target = link.getAttribute('href').slice(1);
-    
-    // Hide all sections
-    document.querySelectorAll('section[id$="-section"]').forEach(s => s.classList.add('hidden'));
-    
-    // Show target section
-    const section = $(`${target}-section`);
-    if (section) section.classList.remove('hidden');
-    
-    // Update active nav link
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active', 'bg-brand-500', 'text-white'));
-    link.classList.add('active', 'bg-brand-500', 'text-white');
-    
-    // Load data for section
-    if (target === 'leads') loadLeads();
-    if (target === 'orders') loadOrders();
-    if (target === 'agents') loadAgents();
-    if (target === 'analytics') loadAnalytics();
-  });
-});
-
-// ============================================
-// DASHBOARD INITIALIZATION
-// ============================================
+document.addEventListener('DOMContentLoaded', initDashboard);
 
 async function initDashboard() {
   try {
-    await loadDashboardData();
-  } catch (err) {
-    console.error('Failed to initialize dashboard:', err);
-    toast('⚠️ فشل تحميل البيانات');
-  }
-}
-
-async function loadDashboardData() {
-  try {
-    // Load leads
-    const leadsResult = await window.SupabaseService.getLeads({}, 1, 1000);
-    allLeads = leadsResult.data;
-    
-    // Update KPIs
-    updateKPIs();
-    
-    // Update charts
-    updateCharts();
-    
-    // Load recent activity
-    await loadRecentActivity();
-  } catch (err) {
-    console.error('Error loading dashboard data:', err);
-  }
-}
-
-function updateKPIs() {
-  const total = allLeads.length;
-  const newLeads = allLeads.filter(l => l.status === 'جديد').length;
-  const completed = allLeads.filter(l => l.status === 'تم البيع').length;
-  
-  $('kpi-leads').textContent = total;
-  $('kpi-new-leads').textContent = newLeads;
-  $('kpi-completed').textContent = completed;
-  $('kpi-revenue').textContent = '0 ر.س'; // TODO: Calculate from orders
-}
-
-function updateCharts() {
-  const brandColors = ['#10b981', '#0d9668', '#d4af37', '#6366f1', '#f59e0b', '#94a3b8'];
-  
-  // Agent Type Distribution
-  const agents = {};
-  allLeads.forEach(l => {
-    const type = l.agent_type || 'غير محدد';
-    agents[type] = (agents[type] || 0) + 1;
-  });
-  
-  if (agentChart) agentChart.destroy();
-  agentChart = new Chart($('agents-chart'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(agents),
-      datasets: [{
-        data: Object.values(agents),
-        backgroundColor: brandColors,
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { family: 'IBM Plex Sans Arabic' }, padding: 14 }
-        }
-      }
-    }
-  });
-  
-  // Plan Distribution
-  const plans = {};
-  allLeads.forEach(l => {
-    const plan = l.plan || 'غير محدد';
-    plans[plan] = (plans[plan] || 0) + 1;
-  });
-  
-  if (planChart) planChart.destroy();
-  planChart = new Chart($('plans-chart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(plans),
-      datasets: [{
-        label: 'عدد الطلبات',
-        data: Object.values(plans),
-        backgroundColor: '#10b981',
-        borderRadius: 8,
-        maxBarThickness: 60
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { precision: 0, font: { family: 'IBM Plex Sans Arabic' } }
-        },
-        x: { ticks: { font: { family: 'IBM Plex Sans Arabic' } } }
-      }
-    }
-  });
-}
-
-async function loadRecentActivity() {
-  try {
-    const logs = await window.SupabaseService.getActivityLogs({}, 10);
-    const container = $('recent-activity');
-    
-    if (logs.length === 0) {
-      container.innerHTML = '<p class="text-slate-500 text-center py-8">لا توجد أنشطة حديثة</p>';
+    const session = await window.SupabaseAPI.getSession();
+    if (!session) {
+      window.location.href = 'login.html';
       return;
     }
+    currentUser = session.user;
+    userProfile = await window.SupabaseAPI.getUserProfile();
     
-    container.innerHTML = logs.map(log => `
-      <div class="flex items-center justify-between p-4 border-b border-slate-100 last:border-b-0">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center text-brand-500">
-            <i class="fa-solid fa-${getActivityIcon(log.action)}"></i>
-          </div>
-          <div>
-            <p class="font-bold text-sm">${getActivityLabel(log.action, log.resource_type)}</p>
-            <p class="text-xs text-slate-500">${new Date(log.created_at).toLocaleString('ar-SA')}</p>
-          </div>
-        </div>
-        <span class="text-xs bg-slate-100 px-3 py-1 rounded-full">${log.resource_type}</span>
-      </div>
+    const userNameEl = document.getElementById('user-name');
+    if (userNameEl) userNameEl.textContent = userProfile.full_name || currentUser.email;
+    
+    // Setup UI
+    setupTabs();
+    setupProfileForm();
+    setupPaymentForm();
+    setupLogout();
+    
+    // Load initial data
+    await refreshAllData();
+    
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const contentArea = document.getElementById('content-area');
+    
+    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+    if (contentArea) contentArea.classList.replace('opacity-0', 'opacity-100');
+  } catch (err) {
+    toast('حدث خطأ أثناء تحميل لوحة التحكم', 'error');
+  }
+}
+
+async function refreshAllData() {
+  await Promise.all([
+    loadOverviewData(),
+    loadLeadsData(),
+    loadPaymentsData()
+  ]);
+}
+
+function setupTabs() {
+  const links = document.querySelectorAll('.sidebar-link[data-tab]');
+  const sections = document.querySelectorAll('.tab-content');
+  
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      const target = link.dataset.tab;
+      
+      links.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      
+      sections.forEach(s => {
+        if (s.id === `tab-${target}`) {
+          s.classList.remove('hidden');
+        } else {
+          s.classList.add('hidden');
+        }
+      });
+
+      history.pushState(null, null, `#${target}`);
+    });
+  });
+
+  const hash = window.location.hash.substring(1);
+  if (hash) {
+    const activeLink = document.querySelector(`.sidebar-link[data-tab="${hash}"]`);
+    if (activeLink) activeLink.click();
+  }
+}
+
+async function loadOverviewData() {
+  try {
+    const leadsResult = await window.SupabaseAPI.getLeads(1, 5, { user_id: currentUser.id });
+    const orders = await window.SupabaseAPI.getOrders({ user_id: currentUser.id });
+    const subs = await window.SupabaseAPI.getSubscriptions({ user_id: currentUser.id });
+
+    const statLeads = document.getElementById('stat-leads');
+    const statAgents = document.getElementById('stat-agents');
+    const statSubs = document.getElementById('stat-subs');
+
+    if (statLeads) statLeads.textContent = leadsResult.total;
+    if (statAgents) statAgents.textContent = (orders || []).filter(o => o.status === 'completed').length;
+    if (statSubs) statSubs.textContent = (subs || []).length;
+
+    const tbody = document.getElementById('recent-leads-body');
+    if (!tbody) return;
+
+    if (leadsResult.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-slate-400">لا توجد طلبات حديثة</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = leadsResult.data.map(lead => `
+      <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+        <td class="py-4 font-bold text-sm">${lead.agent_type || 'طلب عام'}</td>
+        <td class="py-4 text-slate-500 text-xs">${new Date(lead.created_at).toLocaleDateString('ar-SA')}</td>
+        <td class="py-4">
+          <span class="badge ${getStatusClass(lead.status)}">${lead.status}</span>
+        </td>
+      </tr>
     `).join('');
   } catch (err) {
-    console.error('Error loading activity:', err);
+    // Error logged silently in production
   }
 }
 
-// ============================================
-// LEADS MANAGEMENT
-// ============================================
-
-async function loadLeads() {
+async function loadLeadsData() {
   try {
-    const result = await window.SupabaseService.getLeads({}, currentLeadsPage, leadsPerPage);
-    allLeads = result.data;
+    const leadsResult = await window.SupabaseAPI.getLeads(1, 50, { user_id: currentUser.id });
+    const tbody = document.getElementById('full-leads-body');
+    if (!tbody) return;
     
-    renderLeadsTable();
-    updateLeadsPagination(result.total);
+    if (leadsResult.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد طلبات مسجلة</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = leadsResult.data.map(lead => `
+      <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+        <td class="py-4 font-bold text-sm">${lead.agent_type || 'طلب عام'}</td>
+        <td class="py-4 text-slate-600 text-sm">${lead.company || '-'}</td>
+        <td class="py-4 text-slate-500 text-xs">${new Date(lead.created_at).toLocaleDateString('ar-SA')}</td>
+        <td class="py-4">
+          <span class="badge ${getStatusClass(lead.status)}">${lead.status}</span>
+        </td>
+      </tr>
+    `).join('');
   } catch (err) {
-    console.error('Error loading leads:', err);
-    toast('⚠️ فشل تحميل العملاء');
+    // Error logged silently in production
   }
 }
 
-function renderLeadsTable() {
-  const tbody = $('leads-tbody');
+async function loadPaymentsData() {
+  try {
+    const supabase = await window.SupabaseAPI.initSupabase();
+    const { data, error } = await supabase
+      .from('bank_transfers')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const tbody = document.getElementById('payments-body');
+    if (!tbody) return;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-slate-400">لا توجد عمليات دفع مسجلة</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(pay => `
+      <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+        <td class="py-4 px-4 font-bold text-brand-600">${pay.amount} ر.س</td>
+        <td class="py-4 px-4 text-slate-600 text-sm">${pay.beneficiary_name}</td>
+        <td class="py-4 px-4 text-slate-500 text-xs">${new Date(pay.created_at).toLocaleDateString('ar-SA')}</td>
+        <td class="py-4 px-4">
+          <span class="badge ${getPaymentStatusClass(pay.status)}">${getPaymentStatusText(pay.status)}</span>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    // Error logged silently in production
+  }
+}
+
+function setupProfileForm() {
+  const form = document.getElementById('profile-form');
+  if (!form) return;
+
+  form.full_name.value = userProfile.full_name || '';
+  form.username.value = userProfile.username || '';
+  form.company.value = userProfile.company || '';
+  form.phone.value = userProfile.phone || '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'جاري الحفظ...';
+
+    try {
+      const data = {
+        full_name: form.full_name.value,
+        username: form.username.value,
+        company: form.company.value,
+        phone: form.phone.value
+      };
+      await window.SupabaseAPI.updateProfile(data);
+      toast('✅ تم تحديث الملف الشخصي بنجاح');
+    } catch (err) {
+      toast('⚠️ فشل التحديث: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'حفظ التغييرات';
+    }
+  });
+}
+
+function setupPaymentForm() {
+  const form = document.getElementById('payment-form');
+  const fileInput = document.getElementById('receipt-file');
+  const fileInfo = document.getElementById('file-info');
+
+  if (!form) return;
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      fileInfo.innerHTML = `
+        <i class="fa-solid fa-file-image text-3xl text-brand-500 mb-2"></i>
+        <p class="text-brand-600 font-bold text-sm">${file.name}</p>
+        <p class="text-slate-400 text-[10px]">${(file.size / 1024).toFixed(1)} KB</p>
+      `;
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('payment-submit-btn');
+    const file = fileInput.files[0];
+
+    if (!file) {
+      toast('يرجى اختيار صورة الإيصال', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> جاري الرفع...';
+
+    try {
+      const supabase = await window.SupabaseAPI.initSupabase();
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('receipts')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
+
+      const transferData = {
+        beneficiary_name: form.beneficiary_name.value,
+        amount: parseFloat(form.amount.value),
+        receipt_url: publicUrl,
+        bank_name: 'البنك الأهلي السعودي',
+        iban: 'SA 00 0000 0000 0000 0000 0000'
+      };
+
+      await window.SupabaseAPI.submitBankTransfer(transferData);
+      
+      toast('✅ تم إرسال الإيصال بنجاح. ستتم مراجعته قريباً.');
+      form.reset();
+      if (fileInfo) {
+        fileInfo.innerHTML = `
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
+          <p class="text-slate-500 text-sm">اضغط هنا أو اسحب الصورة لرفع الإيصال</p>
+        `;
+      }
+      
+      const paymentsTab = document.querySelector('.sidebar-link[data-tab="payments"]');
+      if (paymentsTab) paymentsTab.click();
+      await loadPaymentsData();
+
+    } catch (err) {
+      toast('⚠️ فشل الإرسال: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'إرسال الإيصال للمراجعة';
+    }
+  });
+}
+
+function setupLogout() {
+  const btn = document.getElementById('logout-btn');
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        await window.SupabaseAPI.signOut();
+        window.location.href = 'index.html';
+      }
+    });
+  }
+}
+
+function getStatusClass(status) {
+  const classes = {
+    'جديد': 'bg-blue-50 text-blue-600',
+    'تم التواصل': 'bg-amber-50 text-amber-600',
+    'تم البيع': 'bg-green-50 text-green-600',
+    'ملغي': 'bg-red-50 text-red-600'
+  };
+  return classes[status] || 'bg-slate-50 text-slate-600';
+}
+
+function getPaymentStatusClass(status) {
+  const classes = {
+    'pending': 'bg-amber-50 text-amber-600',
+    'approved': 'bg-green-50 text-green-600',
+    'rejected': 'bg-red-50 text-red-600'
+  };
+  return classes[status] || 'bg-slate-50 text-slate-600';
+}
+
+function getPaymentStatusText(status) {
+  const texts = {
+    'pending': 'قيد المراجعة',
+    'approved': 'تم القبول',
+    'rejected': 'مرفوض'
+  };
+  return texts[status] || status;
+}
+
+function toast(msg, type = 'success') {
+  const toastEl = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-msg');
+  const toastIcon = document.getElementById('toast-icon');
   
-  if (allLeads.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">لا توجد عملاء</td></tr>';
+  if (!toastEl || !toastMsg || !toastIcon) {
+    alert(msg);
     return;
   }
+
+  toastMsg.textContent = msg;
   
-  tbody.innerHTML = allLeads.map(lead => `
-    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-      <td class="py-4 px-4">
-        <p class="font-bold">${lead.name}</p>
-        <p class="text-xs text-slate-500">${lead.company || '-'}</p>
-      </td>
-      <td class="py-4 px-4 font-mono text-sm" dir="ltr">${lead.phone}</td>
-      <td class="py-4 px-4">${lead.agent_type || '-'}</td>
-      <td class="py-4 px-4">${lead.plan || '-'}</td>
-      <td class="py-4 px-4">
-        <select class="lead-status-select px-3 py-1 border border-slate-200 rounded-lg text-sm" data-id="${lead.id}">
-          <option ${lead.status === 'جديد' ? 'selected' : ''}>جديد</option>
-          <option ${lead.status === 'تم التواصل' ? 'selected' : ''}>تم التواصل</option>
-          <option ${lead.status === 'تم البيع' ? 'selected' : ''}>تم البيع</option>
-          <option ${lead.status === 'ملغي' ? 'selected' : ''}>ملغي</option>
-        </select>
-      </td>
-      <td class="py-4 px-4">
-        <button class="text-brand-500 hover:text-brand-600 transition" title="تعديل">
-          <i class="fa-solid fa-edit"></i>
-        </button>
-        <button class="text-red-500 hover:text-red-600 transition ml-3" title="حذف" data-delete="${lead.id}">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </td>
-    </tr>
-  `).join('');
+  if (type === 'error') {
+    toastIcon.className = 'w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white';
+    toastIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  } else {
+    toastIcon.className = 'w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white';
+    toastIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+  }
   
-  // Attach event listeners
-  document.querySelectorAll('.lead-status-select').forEach(select => {
-    select.addEventListener('change', async e => {
-      const leadId = e.target.dataset.id;
-      const newStatus = e.target.value;
-      try {
-        await window.SupabaseService.updateLead(leadId, { status: newStatus });
-        toast('✅ تم تحديث الحالة');
-      } catch (err) {
-        console.error('Error updating lead:', err);
-        toast('⚠️ فشل التحديث');
-      }
-    });
-  });
-  
-  document.querySelectorAll('[data-delete]').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      if (confirm('متأكد من حذف هذا العميل؟')) {
-        try {
-          await window.SupabaseService.deleteLead(e.target.closest('[data-delete]').dataset.delete);
-          toast('✅ تم حذف العميل');
-          loadLeads();
-        } catch (err) {
-          console.error('Error deleting lead:', err);
-          toast('⚠️ فشل الحذف');
-        }
-      }
-    });
-  });
+  toastEl.classList.remove('hidden');
+  setTimeout(() => toastEl.classList.add('hidden'), 4000);
 }
-
-function updateLeadsPagination(total) {
-  const totalPages = Math.ceil(total / leadsPerPage);
-  $('leads-count').textContent = `${total} عميل`;
-  $('leads-page').textContent = `${currentLeadsPage} / ${totalPages}`;
-  $('leads-prev').disabled = currentLeadsPage <= 1;
-  $('leads-next').disabled = currentLeadsPage >= totalPages;
-}
-
-$('leads-prev')?.addEventListener('click', () => {
-  if (currentLeadsPage > 1) {
-    currentLeadsPage--;
-    loadLeads();
-  }
-});
-
-$('leads-next')?.addEventListener('click', () => {
-  currentLeadsPage++;
-  loadLeads();
-});
-
-// ============================================
-// ORDERS MANAGEMENT
-// ============================================
-
-async function loadOrders() {
-  try {
-    const result = await window.SupabaseService.getOrders({}, 1, 50);
-    console.log('Orders:', result.data);
-  } catch (err) {
-    console.error('Error loading orders:', err);
-  }
-}
-
-// ============================================
-// AGENTS MANAGEMENT
-// ============================================
-
-async function loadAgents() {
-  try {
-    const agents = await window.SupabaseService.getAgents({});
-    console.log('Agents:', agents);
-  } catch (err) {
-    console.error('Error loading agents:', err);
-  }
-}
-
-// ============================================
-// ANALYTICS
-// ============================================
-
-async function loadAnalytics() {
-  try {
-    const analytics = await window.SupabaseService.getAnalytics();
-    console.log('Analytics:', analytics);
-  } catch (err) {
-    console.error('Error loading analytics:', err);
-  }
-}
-
-// ============================================
-// UTILITIES
-// ============================================
-
-function getActivityIcon(action) {
-  const icons = {
-    'create': 'plus',
-    'update': 'pen',
-    'delete': 'trash',
-    'login': 'sign-in',
-    'logout': 'sign-out'
-  };
-  return icons[action] || 'circle';
-}
-
-function getActivityLabel(action, resourceType) {
-  const labels = {
-    'create': `تم إضافة ${resourceType}`,
-    'update': `تم تحديث ${resourceType}`,
-    'delete': `تم حذف ${resourceType}`,
-    'login': 'تسجيل دخول',
-    'logout': 'تسجيل خروج'
-  };
-  return labels[`${action}`] || action;
-}
-
-function toast(msg) {
-  const el = $('toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 3000);
-}
-
-// ============================================
-// EVENT LISTENERS
-// ============================================
-
-$('refresh-btn')?.addEventListener('click', () => {
-  loadDashboardData();
-  toast('✅ تم التحديث');
-});
-
-$('logout-btn')?.addEventListener('click', () => {
-  if (confirm('متأكد من تسجيل الخروج؟')) {
-    sessionStorage.clear();
-    location.href = '/';
-  }
-});
-
-// ============================================
-// INITIALIZATION
-// ============================================
-
-document.addEventListener('DOMContentLoaded', initDashboard);

@@ -46,9 +46,13 @@ tailwind.config = {
       <li><a href="#faq-section" class="hover:text-brand-500 transition">الأسئلة الشائعة</a></li>
     </ul>
     <div class="flex items-center gap-3">
-      <a href="#contact-section" class="hidden sm:inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition">
-        اطلب عميلك الآن <i class="fa-solid fa-arrow-left text-xs"></i>
-      </a>
+      <div id="auth-nav" class="hidden md:flex items-center gap-2">
+        <a href="login.html" class="text-white hover:text-brand-500 text-sm font-bold px-3 py-2 transition">دخول</a>
+        <a href="register.html" class="bg-white/10 hover:bg-white/20 text-white text-sm font-bold px-4 py-2 rounded-xl transition border border-white/10">إنشاء حساب</a>
+      </div>
+      <div id="user-nav" class="hidden md:flex items-center gap-2">
+        <a href="dashboard.html" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-brand-500/20">لوحة التحكم</a>
+      </div>
       <button id="mobile-menu-btn" class="md:hidden text-white text-xl w-10 h-10" aria-label="فتح القائمة"><i class="fa-solid fa-bars"></i></button>
     </div>
   </nav>
@@ -60,6 +64,10 @@ tailwind.config = {
       <li><a href="#pricing-section" class="mobile-link">الباقات</a></li>
       <li><a href="#faq-section" class="mobile-link">الأسئلة الشائعة</a></li>
       <li><a href="#contact-section" class="mobile-link text-brand-500 font-bold">اطلب عميلك الآن</a></li>
+      <li class="pt-4 border-t border-white/10 flex flex-col gap-3">
+        <a href="login.html" class="mobile-link">دخول</a>
+        <a href="register.html" class="bg-brand-500 text-white text-center font-bold py-3 rounded-xl">إنشاء حساب</a>
+      </li>
     </ul>
   </div>
 </header>
@@ -469,6 +477,31 @@ tailwind.config = {
 </a>
 
 <script src="js/supabase-config.js"></script>
-<script src="js/main.js"></script>
+<script>
+  // Wait for SupabaseAPI to be initialized
+  (async () => {
+    try {
+      await window.SupabaseAPI.initSupabase();
+      
+      // Update Auth Nav
+      const session = await window.SupabaseAPI.getSession();
+      const authNav = document.getElementById('auth-nav');
+      const userNav = document.getElementById('user-nav');
+      if (session) {
+        authNav?.classList.add('hidden');
+        userNav?.classList.remove('hidden');
+      } else {
+        authNav?.classList.remove('hidden');
+        userNav?.classList.add('hidden');
+      }
+
+      const script = document.createElement('script');
+      script.src = 'js/main.js';
+      document.body.appendChild(script);
+    } catch (e) {
+      console.error('Failed to initialize Supabase:', e);
+    }
+  })();
+</script>
 </body>
 </html>

@@ -1,15 +1,262 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <meta http-equiv="refresh" content="0; url=/admin.html">
-  <link rel="canonical" href="/admin.html">
-  <title>لوحة التحكم — Agent Store</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — Agent Store</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:'#eefbf4', 100:'#d6f5e3', 500:'#10b981', 600:'#0d9668', 700:'#0a7a56', 900:'#064e38' },
+        night: { 800:'#0f172a', 900:'#0b1120' },
+        gold: '#d4af37'
+      },
+      fontFamily: {
+        head: ['Tajawal','sans-serif'],
+        body: ['"IBM Plex Sans Arabic"','sans-serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+  .sidebar-link { @apply flex items-center gap-3 px-4 py-3 rounded-xl transition text-slate-400 hover:bg-white/5 hover:text-white cursor-pointer; }
+  .sidebar-link.active { @apply bg-brand-500 text-white shadow-lg shadow-brand-500/20; }
+  .card { @apply bg-white rounded-3xl shadow-sm border border-slate-100 p-6; }
+  .tab-content { @apply animate-fade-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+</style>
 </head>
-<body>
-  <p>جارٍ تحويلك إلى <a href="/admin.html">لوحة التحكم الآمنة</a>…</p>
-  <script>window.location.replace('/admin.html');</script>
+<body class="font-body bg-slate-50 text-slate-800 antialiased min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="fixed inset-y-0 right-0 w-64 bg-night-900 text-white z-50 hidden lg:flex flex-col">
+  <div class="p-6">
+    <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
+      <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-white text-sm"></i></span>
+      Agent <span class="text-brand-500">Store</span>
+    </a>
+  </div>
+  
+  <nav class="flex-1 px-4 space-y-2 mt-4">
+    <a data-tab="overview" class="sidebar-link active"><i class="fa-solid fa-house"></i> نظرة عامة</a>
+    <a data-tab="leads" class="sidebar-link"><i class="fa-solid fa-inbox"></i> طلباتي</a>
+    <a data-tab="agents" class="sidebar-link"><i class="fa-solid fa-robot"></i> وكلائي</a>
+    <a data-tab="subscriptions" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> الاشتراكات</a>
+    <a data-tab="payments" class="sidebar-link"><i class="fa-solid fa-money-bill-transfer"></i> المدفوعات</a>
+    <a data-tab="profile" class="sidebar-link"><i class="fa-solid fa-user-gear"></i> الملف الشخصي</a>
+    <div class="pt-4 border-t border-white/5 mt-4">
+      <a data-tab="payment-upload" class="sidebar-link bg-brand-500/10 text-brand-500"><i class="fa-solid fa-upload"></i> رفع إيصال التحويل</a>
+    </div>
+  </nav>
+
+  <div class="p-4 border-t border-white/5">
+    <button id="logout-btn" class="sidebar-link w-full text-red-400 hover:bg-red-500/10 hover:text-red-400">
+      <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-1 lg:mr-64 p-4 lg:p-8">
+  <div id="loading-overlay" class="fixed inset-0 bg-white z-[60] flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-slate-500 font-bold">جارٍ التحميل...</p>
+    </div>
+  </div>
+
+  <div id="content-area" class="max-w-5xl mx-auto opacity-0 transition-opacity duration-300">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="font-head font-900 text-3xl mb-1">أهلاً، <span id="user-name">...</span></h1>
+        <p class="text-slate-500">مرحباً بك في لوحة تحكم Agent Store</p>
+      </div>
+    </div>
+
+    <!-- Overview Tab -->
+    <section id="tab-overview" class="tab-content space-y-8">
+      <div class="grid sm:grid-cols-3 gap-6">
+        <div class="card bg-brand-500 text-white border-none">
+          <p class="text-white/80 text-sm font-bold mb-1">إجمالي الطلبات</p>
+          <p class="text-4xl font-900" id="stat-leads">0</p>
+        </div>
+        <div class="card">
+          <p class="text-slate-500 text-sm font-bold mb-1">الوكلاء النشطون</p>
+          <p class="text-4xl font-900 text-night-900" id="stat-agents">0</p>
+        </div>
+        <div class="card">
+          <p class="text-slate-500 text-sm font-bold mb-1">الاشتراكات</p>
+          <p class="text-4xl font-900 text-night-900" id="stat-subs">0</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">آخر الطلبات</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right">
+            <thead>
+              <tr class="text-slate-400 text-sm border-b border-slate-50">
+                <th class="pb-4 font-medium">النوع</th>
+                <th class="pb-4 font-medium">التاريخ</th>
+                <th class="pb-4 font-medium">الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="recent-leads-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Leads Tab -->
+    <section id="tab-leads" class="tab-content hidden space-y-6">
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">قائمة طلباتي</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right">
+            <thead>
+              <tr class="text-slate-400 text-sm border-b border-slate-50">
+                <th class="pb-4 font-medium">نوع العميل</th>
+                <th class="pb-4 font-medium">الشركة</th>
+                <th class="pb-4 font-medium">التاريخ</th>
+                <th class="pb-4 font-medium">الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="full-leads-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agents Tab -->
+    <section id="tab-agents" class="tab-content hidden space-y-6">
+      <div class="card text-center py-12">
+        <div class="w-20 h-20 bg-brand-50 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <h3 class="font-head font-800 text-2xl mb-2">ليس لديك وكلاء نشطون بعد</h3>
+        <p class="text-slate-500 mb-8">اطلب عميلك الذكي الآن وابدأ في أتمتة أعمالك</p>
+        <a href="index.html#agents-section" class="inline-flex bg-brand-500 text-white font-bold px-8 py-3 rounded-xl transition shadow-lg shadow-brand-500/20">استعراض الوكلاء</a>
+      </div>
+    </section>
+
+    <!-- Subscriptions Tab -->
+    <section id="tab-subscriptions" class="tab-content hidden space-y-6">
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">اشتراكاتي الحالية</h3>
+        <div id="subs-list" class="space-y-4">
+          <div class="p-8 text-center text-slate-400">لا توجد اشتراكات نشطة</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payments Tab -->
+    <section id="tab-payments" class="tab-content hidden space-y-6">
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">سجل المدفوعات والتحويلات</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right">
+            <thead>
+              <tr class="text-slate-400 text-sm border-b border-slate-50">
+                <th class="pb-4 px-4 font-medium">المبلغ</th>
+                <th class="pb-4 px-4 font-medium">المحول</th>
+                <th class="pb-4 px-4 font-medium">التاريخ</th>
+                <th class="pb-4 px-4 font-medium">الحالة</th>
+              </tr>
+            </thead>
+            <tbody id="payments-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Tab -->
+    <section id="tab-profile" class="tab-content hidden space-y-6">
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">تعديل الملف الشخصي</h3>
+        <form id="profile-form" class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">الاسم الكامل</label>
+            <input type="text" name="full_name" class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">اسم المستخدم</label>
+            <input type="text" name="username" class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition" dir="ltr">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">اسم الشركة</label>
+            <input type="text" name="company" class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">رقم الجوال</label>
+            <input type="tel" name="phone" class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition" dir="ltr">
+          </div>
+          <div class="sm:col-span-2">
+            <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-8 py-3 rounded-xl transition">حفظ التغييرات</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Payment Upload Tab -->
+    <section id="tab-payment-upload" class="tab-content hidden space-y-6">
+      <div class="card">
+        <h3 class="font-head font-800 text-xl mb-6">رفع إيصال التحويل البنكي</h3>
+        
+        <div class="bg-brand-50 border border-brand-100 p-6 rounded-2xl mb-8">
+          <h4 class="font-bold text-brand-900 mb-4">بيانات الحساب البنكي</h4>
+          <div class="grid sm:grid-cols-2 gap-4 text-sm">
+            <div><p class="text-slate-500">اسم البنك</p><p class="font-bold">البنك الأهلي السعودي</p></div>
+            <div><p class="text-slate-500">اسم المستفيد</p><p class="font-bold">مؤسسة وكلاء الذكاء</p></div>
+            <div class="sm:col-span-2"><p class="text-slate-500">رقم الآيبان (IBAN)</p><p class="font-bold tracking-wider" dir="ltr">SA 00 0000 0000 0000 0000 0000</p></div>
+          </div>
+        </div>
+
+        <form id="payment-form" class="space-y-6">
+          <div class="grid sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">اسم المحول</label>
+              <input type="text" name="beneficiary_name" required class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition" placeholder="الاسم كما يظهر في الحوالة">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">المبلغ المحول</label>
+              <input type="number" name="amount" required class="w-full border-2 border-slate-50 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition" placeholder="0.00">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">صورة الإيصال</label>
+            <div id="drop-zone" class="w-full border-2 border-dashed border-slate-200 rounded-xl px-4 py-8 text-center cursor-pointer hover:border-brand-500 transition relative">
+              <input type="file" id="receipt-file" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+              <div id="file-info">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 mb-2"></i>
+                <p class="text-slate-500 text-sm">اضغط هنا أو اسحب الصورة لرفع الإيصال</p>
+              </div>
+            </div>
+          </div>
+          <button type="submit" id="payment-submit-btn" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-8 py-3 rounded-xl transition w-full sm:w-auto flex items-center justify-center gap-2">
+            <span>إرسال الإيصال للمراجعة</span>
+          </button>
+        </form>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] bg-night-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[300px]">
+  <div id="toast-icon" class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white"><i class="fa-solid fa-check"></i></div>
+  <p id="toast-msg" class="font-bold text-sm"></p>
+</div>
+
+<script src="js/supabase-config.js"></script>
+<script src="js/dashboard.js"></script>
 </body>
 </html>
