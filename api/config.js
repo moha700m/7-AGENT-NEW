@@ -1,5 +1,5 @@
-const VERIFIED_SUPABASE_URL = '';
-const VERIFIED_SUPABASE_ANON_KEY = '';
+const VERIFIED_SUPABASE_URL = 'https://pfrugircpdwrxmfikfhv.supabase.co';
+const VERIFIED_SUPABASE_ANON_KEY = 'sb_publishable_IakXGNQymg7awch3aiC6hg_CEV9BFSf';
 
 module.exports = function handler(request, response) {
   if (request.method !== 'GET') {
