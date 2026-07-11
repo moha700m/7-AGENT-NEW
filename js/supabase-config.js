@@ -134,17 +134,44 @@ async function getSession() {
 
 async function getUserProfile() {
   const client = await initSupabase();
-  const { data: { user } } = await client.auth.getUser();
+
+  const {
+    data: { user }
+  } = await client.auth.getUser();
+
   if (!user) return null;
 
-  const { data, error } = await client
+  let { data, error } = await client
     .from('users')
     .select('*')
     .eq('id', user.id)
-    .single();
-  
+    .maybeSingle();
+
   if (error) throw error;
+
+  if (!data) {
+    const { data: created, error: insertError } = await client
+      .from('users')
+      .insert({
+        id: user.id,
+        email: user.email,
+        full_name:
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          '',
+        role: 'customer',
+        status: 'active'
+      })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    data = created;
+  }
+
   return data;
+}
 }
 
 async function updateProfile(profileData) {
