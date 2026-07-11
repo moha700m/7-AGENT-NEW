@@ -44,7 +44,6 @@ async function initDashboard() {
   try {
     await loadDashboardData();
   } catch (err) {
-    console.error('Failed to initialize dashboard:', err);
     toast('⚠️ فشل تحميل البيانات');
   }
 }
@@ -64,7 +63,7 @@ async function loadDashboardData() {
     // Load recent activity
     await loadRecentActivity();
   } catch (err) {
-    console.error('Error loading dashboard data:', err);
+    // Silent fail for production dashboard
   }
 }
 
@@ -73,10 +72,10 @@ function updateKPIs() {
   const newLeads = allLeads.filter(l => l.status === 'جديد').length;
   const completed = allLeads.filter(l => l.status === 'تم البيع').length;
   
-  $('kpi-leads').textContent = total;
-  $('kpi-new-leads').textContent = newLeads;
-  $('kpi-completed').textContent = completed;
-  $('kpi-revenue').textContent = '0 ر.س'; // TODO: Calculate from orders
+  if ($('kpi-leads')) $('kpi-leads').textContent = total;
+  if ($('kpi-new-leads')) $('kpi-new-leads').textContent = newLeads;
+  if ($('kpi-completed')) $('kpi-completed').textContent = completed;
+  if ($('kpi-revenue')) $('kpi-revenue').textContent = '0 ر.س';
 }
 
 function updateCharts() {
@@ -89,29 +88,32 @@ function updateCharts() {
     agents[type] = (agents[type] || 0) + 1;
   });
   
-  if (agentChart) agentChart.destroy();
-  agentChart = new Chart($('agents-chart'), {
-    type: 'doughnut',
-    data: {
-      labels: Object.keys(agents),
-      datasets: [{
-        data: Object.values(agents),
-        backgroundColor: brandColors,
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { family: 'IBM Plex Sans Arabic' }, padding: 14 }
+  const agentsChartEl = $('agents-chart');
+  if (agentsChartEl && typeof Chart !== 'undefined') {
+    if (agentChart) agentChart.destroy();
+    agentChart = new Chart(agentsChartEl, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(agents),
+        datasets: [{
+          data: Object.values(agents),
+          backgroundColor: brandColors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { family: 'IBM Plex Sans Arabic' }, padding: 14 }
+          }
         }
       }
-    }
-  });
+    });
+  }
   
   // Plan Distribution
   const plans = {};
@@ -120,38 +122,42 @@ function updateCharts() {
     plans[plan] = (plans[plan] || 0) + 1;
   });
   
-  if (planChart) planChart.destroy();
-  planChart = new Chart($('plans-chart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(plans),
-      datasets: [{
-        label: 'عدد الطلبات',
-        data: Object.values(plans),
-        backgroundColor: '#10b981',
-        borderRadius: 8,
-        maxBarThickness: 60
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { precision: 0, font: { family: 'IBM Plex Sans Arabic' } }
-        },
-        x: { ticks: { font: { family: 'IBM Plex Sans Arabic' } } }
+  const plansChartEl = $('plans-chart');
+  if (plansChartEl && typeof Chart !== 'undefined') {
+    if (planChart) planChart.destroy();
+    planChart = new Chart(plansChartEl, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(plans),
+        datasets: [{
+          label: 'عدد الطلبات',
+          data: Object.values(plans),
+          backgroundColor: '#10b981',
+          borderRadius: 8,
+          maxBarThickness: 60
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, font: { family: 'IBM Plex Sans Arabic' } }
+          },
+          x: { ticks: { font: { family: 'IBM Plex Sans Arabic' } } }
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 async function loadRecentActivity() {
   try {
     const logs = await window.SupabaseService.getActivityLogs({}, 10);
     const container = $('recent-activity');
+    if (!container) return;
     
     if (logs.length === 0) {
       container.innerHTML = '<p class="text-slate-500 text-center py-8">لا توجد أنشطة حديثة</p>';
@@ -173,7 +179,7 @@ async function loadRecentActivity() {
       </div>
     `).join('');
   } catch (err) {
-    console.error('Error loading activity:', err);
+    // Silent fail
   }
 }
 
@@ -189,13 +195,13 @@ async function loadLeads() {
     renderLeadsTable();
     updateLeadsPagination(result.total);
   } catch (err) {
-    console.error('Error loading leads:', err);
     toast('⚠️ فشل تحميل العملاء');
   }
 }
 
 function renderLeadsTable() {
   const tbody = $('leads-tbody');
+  if (!tbody) return;
   
   if (allLeads.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-500">لا توجد عملاء</td></tr>';
@@ -239,7 +245,6 @@ function renderLeadsTable() {
         await window.SupabaseService.updateLead(leadId, { status: newStatus });
         toast('✅ تم تحديث الحالة');
       } catch (err) {
-        console.error('Error updating lead:', err);
         toast('⚠️ فشل التحديث');
       }
     });
@@ -253,7 +258,6 @@ function renderLeadsTable() {
           toast('✅ تم حذف العميل');
           loadLeads();
         } catch (err) {
-          console.error('Error deleting lead:', err);
           toast('⚠️ فشل الحذف');
         }
       }
@@ -263,10 +267,10 @@ function renderLeadsTable() {
 
 function updateLeadsPagination(total) {
   const totalPages = Math.ceil(total / leadsPerPage);
-  $('leads-count').textContent = `${total} عميل`;
-  $('leads-page').textContent = `${currentLeadsPage} / ${totalPages}`;
-  $('leads-prev').disabled = currentLeadsPage <= 1;
-  $('leads-next').disabled = currentLeadsPage >= totalPages;
+  if ($('leads-count')) $('leads-count').textContent = `${total} عميل`;
+  if ($('leads-page')) $('leads-page').textContent = `${currentLeadsPage} / ${totalPages}`;
+  if ($('leads-prev')) $('leads-prev').disabled = currentLeadsPage <= 1;
+  if ($('leads-next')) $('leads-next').disabled = currentLeadsPage >= totalPages;
 }
 
 $('leads-prev')?.addEventListener('click', () => {
@@ -287,10 +291,9 @@ $('leads-next')?.addEventListener('click', () => {
 
 async function loadOrders() {
   try {
-    const result = await window.SupabaseService.getOrders({}, 1, 50);
-    console.log('Orders:', result.data);
+    await window.SupabaseService.getOrders({}, 1, 50);
   } catch (err) {
-    console.error('Error loading orders:', err);
+    // Silent fail
   }
 }
 
@@ -300,10 +303,9 @@ async function loadOrders() {
 
 async function loadAgents() {
   try {
-    const agents = await window.SupabaseService.getAgents({});
-    console.log('Agents:', agents);
+    await window.SupabaseService.getAgents({});
   } catch (err) {
-    console.error('Error loading agents:', err);
+    // Silent fail
   }
 }
 
@@ -313,10 +315,9 @@ async function loadAgents() {
 
 async function loadAnalytics() {
   try {
-    const analytics = await window.SupabaseService.getAnalytics();
-    console.log('Analytics:', analytics);
+    await window.SupabaseService.getAnalytics();
   } catch (err) {
-    console.error('Error loading analytics:', err);
+    // Silent fail
   }
 }
 
@@ -348,6 +349,7 @@ function getActivityLabel(action, resourceType) {
 
 function toast(msg) {
   const el = $('toast');
+  if (!el) return;
   el.textContent = msg;
   el.classList.remove('hidden');
   setTimeout(() => el.classList.add('hidden'), 3000);

@@ -1,8 +1,5 @@
 /* ====== Supabase runtime configuration and shared API (SaaS Version) ====== */
 
-const FALLBACK_SUPABASE_URL = 'https://pfrugircpdwrxmfikfhv.supabase.co';
-const FALLBACK_SUPABASE_ANON_KEY = 'sb_publishable_IakXGNQymg7awch3aiC6hg_CEV9BFSf';
-
 let supabaseClient = null;
 let configPromise = null;
 let sdkPromise = null;
@@ -24,12 +21,13 @@ async function loadRuntimeConfig() {
         }
       }
     } catch (error) {
-      console.info('Runtime config endpoint unavailable; using the verified public project configuration.');
+      console.error('تعذر تحميل إعدادات Supabase من الخادم.');
     }
 
+    // No fallback keys allowed for security. Must rely on environment variables.
     return {
-      supabaseUrl: FALLBACK_SUPABASE_URL,
-      supabaseAnonKey: FALLBACK_SUPABASE_ANON_KEY
+      supabaseUrl: null,
+      supabaseAnonKey: null
     };
   })();
 
@@ -67,6 +65,11 @@ async function initSupabase() {
   if (supabaseClient) return supabaseClient;
 
   const [config, sdk] = await Promise.all([loadRuntimeConfig(), loadSupabaseSdk()]);
+  
+  if (!config.supabaseUrl || !config.supabaseAnonKey) {
+    throw new Error('إعدادات Supabase غير متوفرة. يرجى التأكد من ضبط متغيرات البيئة.');
+  }
+
   supabaseClient = sdk.createClient(config.supabaseUrl, config.supabaseAnonKey, {
     auth: {
       persistSession: true,
@@ -82,8 +85,6 @@ async function initSupabase() {
 
 async function signUp(email, password, fullName) {
   const client = await initSupabase();
-  // Note: In production, email confirmation should be enabled.
-  // For testing/SaaS trial, we can use the default behavior.
   const { data, error } = await client.auth.signUp({
     email,
     password,
