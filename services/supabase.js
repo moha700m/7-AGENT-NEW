@@ -1,8 +1,8 @@
 /* ====== Supabase Service Module ====== */
 'use strict';
 
-const SUPABASE_URL = window.SUPABASE_URL || 'https://pfrugircpdwrxmfikfhv.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable_IakXGNQymg7awch3aiC6hg_CEV9BFSf';
+const SUPABASE_URL = window.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 
 let supabaseClient = null;
 

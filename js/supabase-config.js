@@ -1,7 +1,7 @@
 /* ====== Supabase runtime configuration and shared API ====== */
 
-const FALLBACK_SUPABASE_URL = 'https://pfrugircpdwrxmfikfhv.supabase.co';
-const FALLBACK_SUPABASE_ANON_KEY = 'sb_publishable_IakXGNQymg7awch3aiC6hg_CEV9BFSf';
+const FALLBACK_SUPABASE_URL = '';
+const FALLBACK_SUPABASE_ANON_KEY = '';
 
 let supabaseClient = null;
 let configPromise = null;
@@ -80,8 +80,9 @@ async function initSupabase() {
 
 async function createLead(leadData) {
   const client = await initSupabase();
+  const { data: { user } } = await client.auth.getUser();
   const payload = {
-    user_id: null,
+    user_id: user?.id || null,
     name: String(leadData.name || '').trim(),
     company: String(leadData.company || '').trim() || null,
     email: String(leadData.email || '').trim() || null,
