@@ -4,8 +4,8 @@ module.exports = function handler(request, response) {
     return response.status(405).json({ error: 'Method not allowed' });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.VITA_SUPABASE_URL;
+  const supabaseAnonKey = process.env.VITA_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return response.status(500).json({ error: 'Supabase configuration missing' });
