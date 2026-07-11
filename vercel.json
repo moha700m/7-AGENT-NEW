@@ -1,8 +1,4 @@
 {
-  "env": {
-    "https://pfrugircpdwrxmfikfhv.supabase.coL": "",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmcnVnaXJjcGR3cnhtZmlrZmh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3Mjc5NzgsImV4cCI6MjA5OTMwMzk3OH0.fOUkMrVc2vmpmviRJkbyEX11KEQbe2OTxqFK0_Bfd6c": ""
-  },
   "headers": [
     {
       "source": "/api/config",

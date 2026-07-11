@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
 <script>
 tailwind.config = {
   theme: {
@@ -35,24 +36,29 @@ tailwind.config = {
   .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
 </style>
 </head>
-<body class="font-body bg-slate-50 text-slate-800 antialiased min-h-screen flex">
+<body class="font-body bg-slate-50 text-slate-800 antialiased min-h-screen flex customer-app">
 
 <!-- Sidebar -->
-<aside class="fixed inset-y-0 right-0 w-64 bg-night-900 text-white z-50 hidden lg:flex flex-col">
+<aside id="customer-sidebar" class="fixed inset-y-0 right-0 w-64 bg-night-900 text-white z-50 hidden lg:flex flex-col customer-sidebar">
   <div class="p-6">
     <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
       <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-white text-sm"></i></span>
-      Agent <span class="text-brand-500">Store</span>
+      سوق <span class="text-brand-500">الوكلاء</span>
+      <small>مساحة العمل</small>
     </a>
   </div>
   
   <nav class="flex-1 px-4 space-y-2 mt-4">
-    <a data-tab="overview" class="sidebar-link active"><i class="fa-solid fa-house"></i> نظرة عامة</a>
-    <a data-tab="leads" class="sidebar-link"><i class="fa-solid fa-inbox"></i> طلباتي</a>
-    <a data-tab="agents" class="sidebar-link"><i class="fa-solid fa-robot"></i> وكلائي</a>
+    <a data-tab="overview" class="sidebar-link active"><i class="fa-solid fa-house"></i> الرئيسية</a>
+    <a data-tab="agents" class="sidebar-link"><i class="fa-solid fa-robot"></i> موظفو الذكاء</a>
+    <a data-tab="marketplace" class="sidebar-link"><i class="fa-solid fa-store"></i> المتجر</a>
+    <a data-tab="leads" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i> الطلبات</a>
     <a data-tab="subscriptions" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> الاشتراكات</a>
-    <a data-tab="payments" class="sidebar-link"><i class="fa-solid fa-money-bill-transfer"></i> المدفوعات</a>
+    <a data-tab="payments" class="sidebar-link"><i class="fa-solid fa-wallet"></i> المحفظة والفوترة</a>
+    <a data-tab="messages" class="sidebar-link"><i class="fa-regular fa-message"></i> الرسائل <b>3</b></a>
+    <a data-tab="support" class="sidebar-link"><i class="fa-regular fa-life-ring"></i> الدعم</a>
     <a data-tab="profile" class="sidebar-link"><i class="fa-solid fa-user-gear"></i> الملف الشخصي</a>
+    <a data-tab="settings" class="sidebar-link"><i class="fa-solid fa-sliders"></i> الإعدادات</a>
     <div class="pt-4 border-t border-white/5 mt-4">
       <a data-tab="payment-upload" class="sidebar-link bg-brand-500/10 text-brand-500"><i class="fa-solid fa-upload"></i> رفع إيصال التحويل</a>
     </div>
@@ -67,6 +73,11 @@ tailwind.config = {
 
 <!-- Main Content -->
 <main class="flex-1 lg:mr-64 p-4 lg:p-8">
+  <header class="customer-topbar">
+    <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="فتح القائمة"><i class="fa-solid fa-bars"></i></button>
+    <label class="customer-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="ابحث في مساحة العمل..."></label>
+    <div class="topbar-tools"><button><i class="fa-regular fa-bell"></i><span></span></button><div class="user-chip"><span id="user-avatar">م</span><div><strong>حسابي</strong><small>الخطة الاحترافية</small></div></div></div>
+  </header>
   <div id="loading-overlay" class="fixed inset-0 bg-white z-[60] flex items-center justify-center">
     <div class="text-center">
       <div class="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -84,6 +95,7 @@ tailwind.config = {
 
     <!-- Overview Tab -->
     <section id="tab-overview" class="tab-content space-y-8">
+      <div class="workspace-hero"><div><span>مساحة عملك الذكية</span><h2>حوّل المهام المتكررة إلى نتائج أسرع</h2><p>راقب فريق الذكاء الاصطناعي وأدر استخدامك من لوحة واحدة.</p></div><a href="index.html#agents-section"><i class="fa-solid fa-plus"></i> إضافة موظف ذكي</a></div>
       <div class="grid sm:grid-cols-3 gap-6">
         <div class="card bg-brand-500 text-white border-none">
           <p class="text-white/80 text-sm font-bold mb-1">إجمالي الطلبات</p>
@@ -114,7 +126,20 @@ tailwind.config = {
           </table>
         </div>
       </div>
+      <div class="recommended-block"><div class="section-title"><div><span>مختارة لك</span><h3>موظفون ذكيون موصى بهم</h3></div><button data-open-marketplace>عرض المتجر <i class="fa-solid fa-arrow-left"></i></button></div><div class="recommend-grid"><article><i class="fa-solid fa-headset"></i><h4>مساعد خدمة العملاء</h4><p>يجيب العملاء ويصنّف المحادثات تلقائياً.</p><div><span>4.9 <i class="fa-solid fa-star"></i></span><b>جرّبه الآن</b></div></article><article><i class="fa-solid fa-chart-line"></i><h4>محلل المبيعات</h4><p>يكشف الفرص ويجهز ملخصات يومية.</p><div><span>4.8 <i class="fa-solid fa-star"></i></span><b>جرّبه الآن</b></div></article><article><i class="fa-solid fa-pen-nib"></i><h4>كاتب المحتوى</h4><p>ينشئ نصوصاً عربية متوافقة مع علامتك.</p><div><span>4.7 <i class="fa-solid fa-star"></i></span><b>جرّبه الآن</b></div></article></div></div>
     </section>
+
+    <section id="tab-marketplace" class="tab-content hidden space-y-6"><div class="section-title"><div><span>اكتشف فريقك القادم</span><h3>متجر موظفي الذكاء الاصطناعي</h3></div><label class="market-search"><i class="fa-solid fa-search"></i><input placeholder="ابحث عن موظف ذكي"></label></div><div class="market-grid"><article><div class="agent-cover support"><i class="fa-solid fa-headset"></i></div><span>خدمة العملاء</span><h3>مساعد الدعم الاحترافي</h3><p>يعالج الأسئلة المتكررة ويرفع الحالات المعقدة لفريقك.</p><footer><strong>199 ر.س / شهر</strong><button>عرض التفاصيل</button></footer></article><article><div class="agent-cover sales"><i class="fa-solid fa-chart-simple"></i></div><span>المبيعات</span><h3>مستشار المبيعات الذكي</h3><p>يتابع العملاء المحتملين ويقترح الخطوة التالية.</p><footer><strong>249 ر.س / شهر</strong><button>عرض التفاصيل</button></footer></article><article><div class="agent-cover content"><i class="fa-solid fa-pen-nib"></i></div><span>المحتوى</span><h3>صانع المحتوى العربي</h3><p>ينشئ منشورات وحملات متوافقة مع نبرة علامتك.</p><footer><strong>179 ر.س / شهر</strong><button>عرض التفاصيل</button></footer></article></div></section>
+
+    <section id="tab-messages" class="tab-content hidden space-y-6">
+      <div class="card premium-empty"><span><i class="fa-regular fa-message"></i></span><h3>كل محادثاتك في مكان واحد</h3><p>ستظهر رسائلك مع فريق الدعم وموظفي الذكاء هنا.</p><button>بدء محادثة</button></div>
+    </section>
+
+    <section id="tab-support" class="tab-content hidden space-y-6">
+      <div class="card support-hero"><span><i class="fa-regular fa-life-ring"></i></span><div><h3>كيف يمكننا مساعدتك؟</h3><p>أنشئ تذكرة وسيعود إليك فريقنا في أقرب وقت.</p></div><button>تذكرة جديدة</button></div>
+    </section>
+
+    <section id="tab-settings" class="tab-content hidden space-y-6"><div class="section-title"><div><span>تخصيص حسابك</span><h3>الإعدادات</h3></div><button class="save-settings">حفظ التغييرات</button></div><div class="settings-stack"><article><i class="fa-regular fa-bell"></i><div><h4>إشعارات النشاط</h4><p>تنبيهك عند اكتمال المهام أو وجود تحديث مهم.</p></div><label class="switch"><input type="checkbox" checked><span></span></label></article><article><i class="fa-solid fa-moon"></i><div><h4>المظهر الداكن</h4><p>المظهر الافتراضي لمساحة العمل.</p></div><label class="switch"><input type="checkbox" checked><span></span></label></article><article><i class="fa-solid fa-language"></i><div><h4>لغة الواجهة</h4><p>العربية — اتجاه من اليمين إلى اليسار.</p></div><button class="setting-select">العربية <i class="fa-solid fa-chevron-down"></i></button></article></div></section>
 
     <!-- Leads Tab -->
     <section id="tab-leads" class="tab-content hidden space-y-6">

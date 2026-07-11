@@ -5,6 +5,11 @@ let currentUser = null;
 let userProfile = null;
 
 document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById('mobile-menu-btn');
+  const sidebar = document.getElementById('customer-sidebar');
+  if (button && sidebar) button.addEventListener('click', () => sidebar.classList.toggle('open'));
+});
 
 async function initDashboard() {
   try {
@@ -68,6 +73,10 @@ function setupTabs() {
       history.pushState(null, null, `#${target}`);
     });
   });
+
+  document.querySelectorAll('[data-open-marketplace]').forEach(button => button.addEventListener('click', () => {
+    document.querySelector('.sidebar-link[data-tab="marketplace"]')?.click();
+  }));
 
   const hash = window.location.hash.substring(1);
   if (hash) {

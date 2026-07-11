@@ -30,7 +30,7 @@ tailwind.config = {
 }
 </script>
 </head>
-<body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen">
+<body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen admin-app">
 
 <!-- ===== شاشة الدخول الآمنة ===== -->
 <div id="login-screen" class="fixed inset-0 z-50 bg-night-900 flex items-center justify-center p-4">
@@ -55,14 +55,28 @@ tailwind.config = {
 <!-- ===== المحتوى ===== -->
 <div id="dashboard" class="hidden">
 
-  <header class="bg-night-900 text-white sticky top-0 z-40 shadow-lg">
+  <aside class="admin-sidebar" aria-label="التنقل الرئيسي">
+    <div class="admin-brand"><span class="brand-orb"><i class="fa-solid fa-sparkles"></i></span><div><strong>سوق الوكلاء</strong><small>مساحة الإدارة</small></div></div>
+    <nav class="admin-nav">
+      <a href="#overview" data-admin-tab="overview" class="active"><i class="fa-solid fa-grid-2"></i><span>نظرة عامة</span></a>
+      <a href="#customers" data-admin-tab="customers"><i class="fa-solid fa-users"></i><span>العملاء</span></a>
+      <a href="#employees" data-admin-tab="employees"><i class="fa-solid fa-robot"></i><span>موظفو الذكاء</span></a>
+      <a href="#orders" data-admin-tab="orders"><i class="fa-solid fa-bag-shopping"></i><span>الطلبات</span></a>
+      <a href="#payments" data-admin-tab="payments"><i class="fa-solid fa-credit-card"></i><span>المدفوعات</span></a>
+      <a href="#subscriptions" data-admin-tab="subscriptions"><i class="fa-solid fa-arrows-rotate"></i><span>الاشتراكات</span></a>
+      <a href="#analytics" data-admin-tab="analytics"><i class="fa-solid fa-chart-line"></i><span>التحليلات</span></a>
+      <a href="#tickets" data-admin-tab="tickets"><i class="fa-regular fa-life-ring"></i><span>تذاكر الدعم</span><b>4</b></a>
+      <a href="#settings" data-admin-tab="settings"><i class="fa-solid fa-sliders"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-profile"><span>م</span><div><strong>محمد أحمد</strong><small>مدير النظام</small></div><i class="fa-solid fa-ellipsis"></i></div>
+  </aside>
+
+  <header class="bg-night-900 text-white sticky top-0 z-40 shadow-lg admin-topbar">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
-        <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-sm"></i></span>
-        Agent <span class="text-brand-500">Store</span>
-        <span class="text-slate-400 text-sm font-medium hidden sm:inline">| لوحة التحكم</span>
-      </a>
+      <div><p class="topbar-kicker">لوحة التحكم</p><h1 class="topbar-title">مرحباً بعودتك، محمد</h1></div>
       <div class="flex items-center gap-3">
+        <label class="dashboard-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="ابحث في لوحة التحكم..."><kbd>⌘ K</kbd></label>
+        <button class="icon-action" title="الإشعارات"><i class="fa-regular fa-bell"></i><span></span></button>
         <button id="refresh-btn" class="bg-white/10 hover:bg-white/20 text-sm font-bold px-4 py-2 rounded-lg transition" title="تحديث البيانات">
           <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">تحديث</span>
         </button>
@@ -76,7 +90,12 @@ tailwind.config = {
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 admin-main">
+
+    <section class="admin-hero">
+      <div><span class="eyebrow"><i class="fa-solid fa-circle"></i> النظام يعمل بكفاءة</span><h2>نظرة شاملة على أعمالك</h2><p>تابع الأداء والإيرادات والعملاء من مكان واحد.</p></div>
+      <div class="hero-actions"><button><i class="fa-solid fa-plus"></i> إجراء سريع</button><button class="secondary"><i class="fa-solid fa-arrow-up-right-from-square"></i> تصدير التقرير</button></div>
+    </section>
 
     <!-- بطاقات الإحصائيات -->
     <section id="stats-section" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-label="إحصائيات">
@@ -168,6 +187,14 @@ tailwind.config = {
         </div>
       </div>
     </section>
+
+    <section class="admin-placeholder" data-admin-page="customers"><div class="page-heading"><div><span>إدارة العلاقات</span><h2>العملاء</h2><p>عرض الحسابات النشطة ومتابعة رحلة كل عميل.</p></div><button><i class="fa-solid fa-user-plus"></i> إضافة عميل</button></div><div class="mini-stats"><article><span>إجمالي العملاء</span><strong>1,284</strong><small>+12.4% هذا الشهر</small></article><article><span>عملاء نشطون</span><strong>968</strong><small>75% من الإجمالي</small></article><article><span>عملاء جدد</span><strong>142</strong><small>خلال 30 يوماً</small></article></div><div class="premium-list"><div class="list-head"><h3>أحدث العملاء</h3><label><i class="fa-solid fa-search"></i><input placeholder="ابحث عن عميل"></label></div><div class="person-row"><span>س</span><div><strong>شركة سحاب الرقمية</strong><small>hello@sahab.sa</small></div><em>احترافي</em><b>نشط</b></div><div class="person-row"><span>ن</span><div><strong>نواة التقنية</strong><small>team@nawa.io</small></div><em>أعمال</em><b>نشط</b></div><div class="person-row"><span>م</span><div><strong>متاجر مدار</strong><small>ops@madar.sa</small></div><em>أساسي</em><b>جديد</b></div></div></section>
+    <section class="admin-placeholder" data-admin-page="employees"><div class="page-heading"><div><span>قوة العمل الرقمية</span><h2>موظفو الذكاء الاصطناعي</h2><p>إدارة الوكلاء النشطين ومراقبة أدائهم واستخدامهم.</p></div><button><i class="fa-solid fa-plus"></i> موظف جديد</button></div><div class="agent-grid"><article><i class="fa-solid fa-headset"></i><div><h3>مساعد خدمة العملاء</h3><p>يتولى الاستفسارات والتذاكر على مدار الساعة.</p></div><span>نشط</span><footer><b>98.2%</b><small>معدل النجاح</small></footer></article><article><i class="fa-solid fa-chart-simple"></i><div><h3>محلل المبيعات</h3><p>يلخص الفرص ويتوقع احتمالية الإغلاق.</p></div><span>نشط</span><footer><b>4,890</b><small>مهمة مكتملة</small></footer></article><article><i class="fa-solid fa-pen-nib"></i><div><h3>كاتب المحتوى</h3><p>ينشئ محتوى عربي متسق مع الهوية.</p></div><span class="paused">متوقف</span><footer><b>1,246</b><small>مهمة مكتملة</small></footer></article></div></section>
+    <section class="admin-placeholder" data-admin-page="payments"><div class="page-heading"><div><span>المركز المالي</span><h2>المدفوعات</h2><p>سجل العمليات والتحويلات وإجمالي الإيرادات.</p></div><button class="ghost"><i class="fa-solid fa-download"></i> تصدير</button></div><div class="finance-card"><div><span>صافي الإيرادات</span><strong>284,750 <small>ر.س</small></strong><em>+18.6% عن الشهر الماضي</em></div><div class="bars"><i style="height:42%"></i><i style="height:56%"></i><i style="height:48%"></i><i style="height:78%"></i><i style="height:66%"></i><i style="height:91%"></i><i style="height:82%"></i><i style="height:100%"></i></div></div></section>
+    <section class="admin-placeholder" data-admin-page="subscriptions"><div class="page-heading"><div><span>الإيرادات المتكررة</span><h2>الاشتراكات</h2><p>متابعة الخطط والتجديدات ومؤشرات الاحتفاظ.</p></div></div><div class="mini-stats"><article><span>اشتراكات نشطة</span><strong>816</strong><small>+8.2% هذا الشهر</small></article><article><span>قيمة شهرية متكررة</span><strong>192K</strong><small>ريال سعودي</small></article><article><span>معدل الاحتفاظ</span><strong>94.8%</strong><small>آخر 90 يوماً</small></article></div></section>
+    <section class="admin-placeholder" data-admin-page="analytics"><div class="page-heading"><div><span>ذكاء الأعمال</span><h2>التحليلات</h2><p>فهم النمو والاستخدام والأداء عبر المنصة.</p></div><button class="ghost">آخر 30 يوماً <i class="fa-solid fa-chevron-down"></i></button></div><div class="analytics-panel"><div class="line-visual"><span style="--x:8%;--y:72%"></span><span style="--x:25%;--y:55%"></span><span style="--x:43%;--y:62%"></span><span style="--x:61%;--y:34%"></span><span style="--x:78%;--y:42%"></span><span style="--x:94%;--y:18%"></span><svg viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M3,40 C15,38 18,25 27,27 S42,34 49,24 S65,10 73,20 S87,18 97,6"/></svg></div></div></section>
+    <section class="admin-placeholder" data-admin-page="tickets"><div class="page-heading"><div><span>مركز المساعدة</span><h2>تذاكر الدعم</h2><p>تابع الطلبات المفتوحة ووقت الاستجابة.</p></div><button><i class="fa-solid fa-plus"></i> تذكرة جديدة</button></div><div class="premium-list"><div class="person-row"><span class="ticket high">!</span><div><strong>تعذر تشغيل الموظف الذكي</strong><small>#TK-2841 · شركة سحاب</small></div><em>أولوية عالية</em><b>مفتوحة</b></div><div class="person-row"><span class="ticket">؟</span><div><strong>استفسار عن الفاتورة الأخيرة</strong><small>#TK-2837 · نواة التقنية</small></div><em>متوسطة</em><b>قيد المراجعة</b></div></div></section>
+    <section class="admin-placeholder" data-admin-page="settings"><div class="page-heading"><div><span>إعدادات المنصة</span><h2>الإعدادات</h2><p>تفضيلات لوحة التحكم والإشعارات والهوية.</p></div><button>حفظ التغييرات</button></div><div class="settings-grid"><article><i class="fa-solid fa-building"></i><div><h3>بيانات المؤسسة</h3><p>الاسم والشعار وبيانات التواصل.</p></div><i class="fa-solid fa-chevron-left"></i></article><article><i class="fa-regular fa-bell"></i><div><h3>الإشعارات</h3><p>البريد والتنبيهات داخل المنصة.</p></div><i class="fa-solid fa-chevron-left"></i></article><article><i class="fa-solid fa-shield-halved"></i><div><h3>الأمان والصلاحيات</h3><p>إدارة الوصول وأدوار الفريق.</p></div><i class="fa-solid fa-chevron-left"></i></article></div></section>
   </main>
 
   <footer class="text-center text-xs text-slate-400 py-6">
