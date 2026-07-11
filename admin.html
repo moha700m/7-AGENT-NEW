@@ -30,7 +30,7 @@ tailwind.config = {
 }
 </script>
 </head>
-<body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen">
+<body class="font-body bg-slate-100 text-slate-800 antialiased min-h-screen admin-app">
 
 <!-- ===== شاشة الدخول الآمنة ===== -->
 <div id="login-screen" class="fixed inset-0 z-50 bg-night-900 flex items-center justify-center p-4">
@@ -55,14 +55,28 @@ tailwind.config = {
 <!-- ===== المحتوى ===== -->
 <div id="dashboard" class="hidden">
 
-  <header class="bg-night-900 text-white sticky top-0 z-40 shadow-lg">
+  <aside class="admin-sidebar" aria-label="التنقل الرئيسي">
+    <div class="admin-brand"><span class="brand-orb"><i class="fa-solid fa-sparkles"></i></span><div><strong>سوق الوكلاء</strong><small>مساحة الإدارة</small></div></div>
+    <nav class="admin-nav">
+      <a href="#stats-section" class="active"><i class="fa-solid fa-grid-2"></i><span>نظرة عامة</span></a>
+      <a href="#leads-section"><i class="fa-solid fa-users"></i><span>العملاء</span></a>
+      <a href="#charts-section"><i class="fa-solid fa-robot"></i><span>موظفو الذكاء</span></a>
+      <a href="#leads-section"><i class="fa-solid fa-bag-shopping"></i><span>الطلبات</span></a>
+      <a href="#charts-section"><i class="fa-solid fa-credit-card"></i><span>المدفوعات</span></a>
+      <a href="#charts-section"><i class="fa-solid fa-arrows-rotate"></i><span>الاشتراكات</span></a>
+      <a href="#charts-section"><i class="fa-solid fa-chart-line"></i><span>التحليلات</span></a>
+      <a href="#leads-section"><i class="fa-regular fa-life-ring"></i><span>تذاكر الدعم</span><b>4</b></a>
+      <a href="#"><i class="fa-solid fa-sliders"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-profile"><span>م</span><div><strong>محمد أحمد</strong><small>مدير النظام</small></div><i class="fa-solid fa-ellipsis"></i></div>
+  </aside>
+
+  <header class="bg-night-900 text-white sticky top-0 z-40 shadow-lg admin-topbar">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-2 font-head font-900 text-xl">
-        <span class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><i class="fa-solid fa-robot text-sm"></i></span>
-        Agent <span class="text-brand-500">Store</span>
-        <span class="text-slate-400 text-sm font-medium hidden sm:inline">| لوحة التحكم</span>
-      </a>
+      <div><p class="topbar-kicker">لوحة التحكم</p><h1 class="topbar-title">مرحباً بعودتك، محمد</h1></div>
       <div class="flex items-center gap-3">
+        <label class="dashboard-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" placeholder="ابحث في لوحة التحكم..."><kbd>⌘ K</kbd></label>
+        <button class="icon-action" title="الإشعارات"><i class="fa-regular fa-bell"></i><span></span></button>
         <button id="refresh-btn" class="bg-white/10 hover:bg-white/20 text-sm font-bold px-4 py-2 rounded-lg transition" title="تحديث البيانات">
           <i class="fa-solid fa-rotate"></i> <span class="hidden sm:inline">تحديث</span>
         </button>
@@ -76,7 +90,12 @@ tailwind.config = {
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 admin-main">
+
+    <section class="admin-hero">
+      <div><span class="eyebrow"><i class="fa-solid fa-circle"></i> النظام يعمل بكفاءة</span><h2>نظرة شاملة على أعمالك</h2><p>تابع الأداء والإيرادات والعملاء من مكان واحد.</p></div>
+      <div class="hero-actions"><button><i class="fa-solid fa-plus"></i> إجراء سريع</button><button class="secondary"><i class="fa-solid fa-arrow-up-right-from-square"></i> تصدير التقرير</button></div>
+    </section>
 
     <!-- بطاقات الإحصائيات -->
     <section id="stats-section" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-label="إحصائيات">
